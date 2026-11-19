@@ -1,0 +1,23 @@
+name: Foundry CI
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: stable
+      - name: Install pinned dependencies
+        run: bash scripts/install-deps.sh
+      - name: Format contracts
+        run: forge fmt
+      - name: Build
+        run: forge build --sizes
+      - name: Unit, fuzz and invariants
+        run: FOUNDRY_PROFILE=ci forge test -vvv
