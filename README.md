@@ -2,7 +2,7 @@
 
 **QIE Digital Hackathon 2026 · QIE Mainnet (chain ID 1990)**
 
-[**Public live read-only security lab**](https://qie-sentinel-peach.vercel.app/#demo) · [**Verified SentinelVault**](https://mainnet.qie.digital/address/0xb752F05a55059C89a43a289d5d055F303B6DD96E?tab=contract) · [**Verified PolicyGuard**](https://mainnet.qie.digital/address/0x532Ee81939386E23b8c58076e643D9FCe489F15C?tab=contract)
+[**Public live read-only security lab**](https://qie-sentinel-peach.vercel.app/#demo) · [**Verified SentinelVault**](https://mainnet.qie.digital/address/0xb752F05a55059C89a43a289d5d055F303B6DD96E?tab=contract) · [**Verified PolicyGuard**](https://mainnet.qie.digital/address/0x532Ee81939386E23b8c58076e643D9FCe489F15C?tab=contract) · [**Demo video (2:59)**](https://youtu.be/GedB5dSSj8g)
 
 QIE Sentinel is a QUSDC-only, human-authorized AI-agent payment prototype. A local agent interprets payment requests and proposes transactions. Deterministic policy checks reject invalid requests before signing. A separate owner signs an **exact EIP-712 payment intent**; an independent executor submits it to the verified Solidity vault, which checks executor, expiry, QUSDC token, nonce, signature, PolicyGuard budget/allowlist and transfer before settlement.
 
