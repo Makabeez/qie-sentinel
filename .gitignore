@@ -19,3 +19,9 @@ sentinel-showcase.html
 README-before-v08.md
 .vercel/
 node_modules/
+
+# local-only
+.venv*/
+*.bak
+*.phase*.bak
+install_phase*.py
