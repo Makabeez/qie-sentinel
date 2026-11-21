@@ -10,7 +10,7 @@ Show the trust boundary diagram: task -> interpreter -> policy preflight -> owne
 
 ## 0:55–1:35 — Attack scenarios
 
-On the **public Vercel page**, click the invalid recipient, oversize amount, used nonce, and expired intent scenarios. Say explicitly: “These buttons are an offline simulation of the actual policy rules.”
+On the **public Vercel page**, click the allowlisted payment and four unsafe scenarios. State accurately: “These buttons run read-only checks against QIE Mainnet; unknown recipient and over-limit return PolicyGuard eth_call reverts, while replay and expiry use vault nonce state and the latest block timestamp. These are not failed mined transactions or signed executions.”
 
 ## 1:35–2:05 — Real agent audit
 
@@ -22,7 +22,7 @@ Show the previously confirmed EIP-712 approval queue entry (`nonce 2`, `0.10 QUS
 
 ## 2:35–3:00 — Controls and close
 
-Show successful pause/unpause receipts, QUSDC spending cap, on-chain contract addresses. Close with: “The agent proposes. The owner authorizes. The blockchain enforces.” Mention hackathon MVP, not independently audited.
+Show successful pause/unpause receipts, all three mainnet payments (0.25 + 0.10 + 0.10 QUSDC), and verified source tabs for both contracts. Disclose that all payments went to the same allowlisted recipient and do not constitute external traction. Close with: “The agent proposes. The owner authorizes. The blockchain enforces.” Mention hackathon MVP, not independently audited.
 
 ## Rehearsal checklist
 
@@ -31,4 +31,5 @@ Show successful pause/unpause receipts, QUSDC spending cap, on-chain contract ad
 - GitHub Actions shows green Python and Foundry checks (only claim this after it runs).
 - Public Vercel page is accessible from another device without a VPN.
 - No secrets in screen recording, shell history, export files, or browser tabs.
-- Explorer links for deployment, pause, unpause, and both payments work.
+- Explorer links for deployment, pause, unpause, **all three payments**, and verified source for both contracts work.
+- No simulated backend or fabricated owner approval; for an authentic demonstration show the actual local proposal and audit trail, with secrets, IDs and signatures redacted.
