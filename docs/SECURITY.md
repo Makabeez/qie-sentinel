@@ -7,7 +7,7 @@
 - QIE chain ID 1990; token bound to QUSDC `0x3F43DA82eC9A4f5285F10FaF1F26EcA7319E5DA5`.
 - Owner-only administration, recipient allowlisting, per-payment cap, daily spending cap, EIP-712 signed intents, nonce bitmap, deadlines, emergency pause/recovery.
 - Only owner-signed payment structs may be executed by the specifically authorized executor.
-- No signature or private key is needed for public Vercel pages. The browser simulation cannot move tokens.
+- No signature or private key is needed for public Vercel pages. The read-only lab calls publicly exposed QIE Mainnet methods; it cannot sign or transfer tokens.
 
 ## Threats and residual risks
 
@@ -24,4 +24,4 @@
 
 ## Disclosures in demos
 
-Distinguish **real on-chain successful payments** (linkable explorer receipts), **recorded off-chain rejections**, **browser-simulated examples**, and **optional AI-generated explanations**. Never describe a simulated rejection as a reverted mainnet transaction.
+Distinguish **real on-chain successful payments** (three linked receipts), **recorded off-chain preflight rejections** (SQLite audit), **read-only contract eth_call reverts** (not mined transactions), **chain-state nonce/deadline comparisons**, and **optional AI-generated explanations**. Never describe an eth_call revert as a failed on-chain transaction or these self-directed test payments as independent customer traction. Both deployed contracts are source-verified, but the system is not independently audited. The owner-privileged emergency recovery function is implemented but has not been demonstrated on mainnet.
