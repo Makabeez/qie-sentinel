@@ -82,6 +82,20 @@ A read-only public demonstration of policy checks **is not the full agent UI**. 
 
 Read the [architecture and trust boundaries](docs/ARCHITECTURE.md), [security disclosures](docs/SECURITY.md), or [recorded demonstration](https://youtu.be/GedB5dSSj8g).
 
+## Repository guide
+
+| Directory | Purpose |
+|---|---|
+| [`src/`](src/) · [`test/`](test/) | Deployed Solidity contracts and Foundry security tests |
+| [`script/`](script/) | Foundry deployment utilities |
+| [`sentinel-agent/`](sentinel-agent/) | **Primary local agent**: proposals, EIP-712 owner workflow, executor, evidence and tests |
+| [`site/`](site/) | **Public Vercel showcase** and read-only QIE Mainnet security lab |
+| [`docs/`](docs/) | Architecture, security disclosures and demo guide |
+| [`scripts/`](scripts/) | Validation, dependency installation and verification utilities |
+| [`backend/`](backend/) · [`web/`](web/) · [`tests/`](tests/) | **Legacy proposal-only FastAPI sandbox**; separate from the primary local agent and public site |
+
+The legacy FastAPI sandbox is retained for reproducibility, not used by Vercel and **must not be publicly hosted**. The live site does not connect to either private backend.
+
 ## Build and test locally
 
 - Solidity **0.8.24**, OpenZeppelin **5.0.2**, Forge Std **1.9.7**, `evm_version="paris"`.
