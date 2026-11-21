@@ -27,7 +27,7 @@ Both contracts have **Contract Source Code Verified** status on the QIE explorer
 | Vault deployment, block 12,006,079 | Confirmed | [Deployment transaction](https://mainnet.qie.digital/tx/0x8edf56430a508d1595e7cdbee0b0187dbcc4bc9a2c07b2683da4f9aef30a8d94) |
 | Owner pauses vault | Confirmed | [Pause](https://mainnet.qie.digital/tx/0x6b039508ea4eb6a9c40b97a65ef1eb211b1c7f143e58a5bb144fecad54dcda1d) |
 | Owner unpauses vault | Confirmed | [Unpause](https://mainnet.qie.digital/tx/0xdac70752ed0c6dd36593059109c2feb4c7c1519cbe226842016ce6eefcb26e35) |
-| Earlier QUSDC payment | 0.25 QUSDC | [Receipt](https://mainnet.qie.digital/tx/0xf26e8863dad1f16399bcf3d5cfb8efad378897446da585c16afb2eeaef3d9442) |
+| Earlier QUSDC payment | 0.25 QUSDC | [Receipt](https://mainnet.qie.digital/tx/0xf26e8863da1d116399bcf3d5cfb8efad378897446da585c16afb2eeaef3d9442) |
 | Owner-signed executor payment, nonce 1 | 0.10 QUSDC | [Receipt](https://mainnet.qie.digital/tx/0x196dce5ce2ad7ad2f327eb5ff9d41c171dd0535bbcdb001742832b1862a5d59a) |
 | Proposal queue → signed intent → executor, nonce 2 | 0.10 QUSDC | [Receipt](https://mainnet.qie.digital/tx/0x95f122e6b4679727751dd8e111ed4a5892fd9d85d07aa0554fcb1a52127c1b48) |
 

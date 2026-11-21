@@ -39,7 +39,7 @@ Show mainnet explorer **Contract Source Code Verified** tabs, compiler solc 0.8.
 - Guard: https://mainnet.qie.digital/address/0x532Ee81939386E23b8c58076e643D9FCe489F15C?tab=contract
 
 Historical successful payment receipts (all to the **same** allowed wallet; not third-party traction):
-- 0.25 QUSDC: https://mainnet.qie.digital/tx/0xf26e8863dad1f16399bcf3d5cfb8efad378897446da585c16afb2eeaef3d9442
+- 0.25 QUSDC: https://mainnet.qie.digital/tx/0xf26e8863da1d116399bcf3d5cfb8efad378897446da585c16afb2eeaef3d9442
 - 0.10 QUSDC, nonce 1: https://mainnet.qie.digital/tx/0x196dce5ce2ad7ad2f327eb5ff9d41c171dd0535bbcdb001742832b1862a5d59a
 - 0.10 QUSDC, nonce 2: https://mainnet.qie.digital/tx/0x95f122e6b4679727751dd8e111ed4a5892fd9d85d07aa0554fcb1a52127c1b48
 

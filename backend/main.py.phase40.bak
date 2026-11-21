@@ -1,0 +1,154 @@
+"""QIE Sentinel Phase 4: read-only chain watcher + proposal-only policy API.
+
+No private keys, signing, ERC20 approvals, or transactions are performed here.
+"""
+import os
+from datetime import datetime, timezone
+from pathlib import Path
+from threading import Lock
+from uuid import uuid4
+
+from fastapi import FastAPI, HTTPException
+from fastapi.responses import FileResponse
+from pydantic import BaseModel, Field
+from web3 import Web3
+
+from backend.policy import Snapshot, evaluate
+
+ROOT = Path(__file__).resolve().parent.parent
+RPC = os.getenv("QIE_RPC_URL", "https://rpc1mainnet.qie.digital")
+CHAIN = int(os.getenv("QIE_CHAIN_ID", "1990"))
+VAULT = os.getenv("SENTINEL_VAULT", "0xb752F05a55059C89a43a289d5d055F303B6DD96E")
+GUARD = os.getenv("SENTINEL_GUARD", "0x532Ee81939386E23b8c58076e643D9FCe489F15C")
+TOKEN = os.getenv("SENTINEL_TOKEN", "0x3F43DA82eC9A4f5285F10FaF1F26EcA7319E5DA5")
+OWNER = os.getenv("SENTINEL_OWNER", "0x395215ab5Dde403801868fa850b89e305F01725E")
+EXECUTOR = os.getenv("SENTINEL_EXECUTOR", "0xD0612b00030AC351EAb6A7800E4b7679e3f7D95A")
+RECIPIENT = os.getenv("SENTINEL_RECIPIENT", "0xce99cF8EdfD199dB02b830445d89E746B8c1C7ff")
+
+# Only the deployed public getters whose signatures are known from the Foundry checks.
+VAULT_ABI = [
+    {"type":"function","name":n,"stateMutability":"view","inputs":[],"outputs":[{"type":t}]}
+    for n,t in [("paused","bool"),("balance","uint256"),("owner","address"),("executor","address")]
+]
+GUARD_ABI = [
+    {"type":"function","name":n,"stateMutability":"view",
+     "inputs":[],"outputs":[{"type":"uint256"}]}
+    for n in ("maxPerTransfer", "dailyLimit")
+] + [
+    {"type":"function","name":"remainingToday","stateMutability":"view","inputs":[],"outputs":[{"type":"uint256"}]},
+    {"type":"function","name":"allowedRecipients","stateMutability":"view","inputs":[{"type":"address","name":"recipient"}],"outputs":[{"type":"bool"}]},
+]
+TOKEN_ABI = [{"type":"function","name":"balanceOf","stateMutability":"view","inputs":[{"type":"address","name":"account"}],"outputs":[{"type":"uint256"}]}]
+
+w3 = Web3(Web3.HTTPProvider(RPC, request_kwargs={"timeout":12}))
+app = FastAPI(title="QIE Sentinel", version="0.1.0")
+proposals: list[dict] = []
+proposal_lock = Lock()
+
+class Proposal(BaseModel):
+    recipient: str
+    amount_base_units: int = Field(ge=1, le=10**18)
+    purpose: str = Field(min_length=3, max_length=180)
+
+
+def contracts():
+    if w3.eth.chain_id != CHAIN:
+        raise RuntimeError(f"Wrong chain: expected {CHAIN}, got {w3.eth.chain_id}")
+    return (
+        w3.eth.contract(address=Web3.to_checksum_address(VAULT), abi=VAULT_ABI),
+        w3.eth.contract(address=Web3.to_checksum_address(GUARD), abi=GUARD_ABI),
+        w3.eth.contract(address=Web3.to_checksum_address(TOKEN), abi=TOKEN_ABI),
+    )
+
+
+def snapshot_for(recipient: str) -> tuple[dict, Snapshot]:
+    vault, guard, token = contracts()
+    addr = Web3.to_checksum_address(recipient)
+    block = w3.eth.block_number
+    # Pin calls to one block to avoid an internally inconsistent view.
+    paused = vault.functions.paused().call(block_identifier=block)
+    bal = vault.functions.balance().call(block_identifier=block)
+    max_tx = guard.functions.maxPerTransfer().call(block_identifier=block)
+    daily = guard.functions.dailyLimit().call(block_identifier=block)
+    remaining = guard.functions.remainingToday().call(block_identifier=block)
+    allowed = guard.functions.allowedRecipients(addr).call(block_identifier=block)
+    onchain_owner = vault.functions.owner().call(block_identifier=block)
+    onchain_executor = vault.functions.executor().call(block_identifier=block)
+    token_balance = token.functions.balanceOf(Web3.to_checksum_address(VAULT)).call(block_identifier=block)
+    if bal != token_balance:
+        raise RuntimeError("Vault and ERC20 balance disagree; refusing to evaluate")
+    snap = Snapshot(paused=paused, vault_balance=bal, remaining_today=remaining,
+                    max_per_transfer=max_tx, allowed=allowed)
+    return ({"chain_id": CHAIN, "block": block, "rpc": RPC, "vault": VAULT,
+             "guard": GUARD, "token": TOKEN, "owner": onchain_owner,
+             "executor": onchain_executor, "recipient": addr, "paused": paused,
+             "vault_balance": bal, "remaining_today": remaining,
+             "daily_limit": daily, "max_per_transfer": max_tx,
+             "allowed_recipient": allowed, "decimals": 6,
+             "observed_at": datetime.now(timezone.utc).isoformat()}, snap)
+
+
+@app.get("/")
+def homepage():
+    return FileResponse(ROOT / "web" / "index.html")
+
+
+@app.get("/api/status")
+def status():
+    try:
+        data, _ = snapshot_for(RECIPIENT)
+        return data
+    except Exception as exc:
+        raise HTTPException(503, detail=f"QIE RPC unavailable or inconsistent: {exc}") from exc
+
+
+@app.post("/api/proposals")
+def new_proposal(item: Proposal):
+    if not Web3.is_address(item.recipient):
+        raise HTTPException(422, detail="Invalid recipient address")
+    try:
+        data, snapshot = snapshot_for(item.recipient)
+    except Exception as exc:
+        raise HTTPException(503, detail=f"Live chain verification failed: {exc}") from exc
+    verdict = evaluate(item.amount_base_units, snapshot)
+    entry = {"id": str(uuid4()), "created_at": datetime.now(timezone.utc).isoformat(),
+             "purpose": item.purpose, "recipient": Web3.to_checksum_address(item.recipient),
+             "amount_base_units": item.amount_base_units, "block_checked": data["block"],
+             **verdict, "execution": "NOT_SUBMITTED"}
+    with proposal_lock:
+        proposals.insert(0, entry)
+        del proposals[100:]
+    return entry
+
+
+@app.get("/api/proposals")
+def list_proposals():
+    with proposal_lock:
+        return {"items": proposals[:30], "storage": "memory_only"}
+
+
+@app.get("/api/transactions")
+def recent_transactions():
+    """Find live QUSDC transfers out of the vault using small bounded RPC log queries."""
+    try:
+        _, _, token = contracts()
+        latest = w3.eth.block_number
+        transfer_topic = Web3.keccak(text="Transfer(address,address,uint256)").to_0x_hex()
+        sender_topic = "0x" + Web3.to_checksum_address(VAULT)[2:].lower().zfill(64)
+        events = []
+        # Chunked bounded windows: avoids broad log requests that RPC providers reject.
+        for end in (latest,):
+            start = max(0, end - 3000)
+            logs = w3.eth.get_logs({"address": Web3.to_checksum_address(TOKEN),
+                                    "fromBlock": start, "toBlock": end,
+                                    "topics": [transfer_topic, sender_topic]})
+            for log in list(logs)[-20:]:
+                events.append({"hash": log["transactionHash"].to_0x_hex(),
+                               "block": log["blockNumber"],
+                               "recipient": Web3.to_checksum_address("0x" + log["topics"][2].hex()[-40:]),
+                               "amount_base_units": int.from_bytes(log["data"], "big")})
+        return {"items": sorted(events, key=lambda e: e["block"], reverse=True),
+                "scanned_from_block": max(0, latest-3000), "scanned_to_block": latest,
+                "note": "Recent window only; historical transfers require an indexed event store."}
+    except Exception as exc:
+        raise HTTPException(503, detail=f"Transaction scan failed: {exc}") from exc
