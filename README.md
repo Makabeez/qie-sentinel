@@ -1,6 +1,6 @@
 <div align="center">
 
-![QIE Sentinel — Autonomous proposals, human-controlled funds](assets/qie-sentinel-banner.svg)
+![QIE Sentinel — Autonomous proposals, human-controlled funds](assets/qie-sentinel-banner-v2.svg)
 
 **Source-verified on QIE Mainnet · AI + Autonomous Agents · Hackathon 2026**
 
