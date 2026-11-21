@@ -1,43 +1,99 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="420" viewBox="0 0 1280 420" role="img" aria-labelledby="title desc">
-<title id="title">QIE Sentinel — Autonomous proposals. Human-controlled funds.</title>
-<desc id="desc">Dark technology banner with a protected five-stage payment path: Agent, Policy, Owner, Executor, Vault; QIE Mainnet chain 1990.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="440" viewBox="0 0 1280 440" role="img" aria-labelledby="t d">
+<title id="t">QIE Sentinel: autonomous proposals, human-controlled funds</title>
+<desc id="d">An AI agent proposes a payment; policy checks it, the owner signs an EIP-712 intent, a separate executor submits it and the verified vault enforces it on QIE Mainnet, chain 1990.</desc>
 <defs>
-  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#080e1d"/><stop offset=".56" stop-color="#101c31"/><stop offset="1" stop-color="#07151b"/></linearGradient>
-  <radialGradient id="glow" cx="72%" cy="43%" r="75%"><stop stop-color="#143f4e" stop-opacity=".66"/><stop offset="1" stop-color="#143f4e" stop-opacity="0"/></radialGradient>
-  <linearGradient id="edge" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#4ce8c6"/><stop offset="1" stop-color="#71b6f5"/></linearGradient>
-  <linearGradient id="heading" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#f6faff"/><stop offset="1" stop-color="#a9e9e0"/></linearGradient>
-  <pattern id="dots" width="26" height="26" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1" fill="#9fdef0" opacity=".13"/></pattern>
-  <filter id="soft"><feGaussianBlur stdDeviation="25"/></filter>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#070c18"/><stop offset=".6" stop-color="#0c1628"/><stop offset="1" stop-color="#061318"/></linearGradient>
+  <radialGradient id="glowR" cx="83%" cy="40%" r="42%"><stop offset="0" stop-color="#1fc8a8" stop-opacity=".20"/><stop offset="1" stop-color="#1fc8a8" stop-opacity="0"/></radialGradient>
+  <radialGradient id="glowL" cx="8%" cy="0%" r="55%"><stop offset="0" stop-color="#2b6cb0" stop-opacity=".16"/><stop offset="1" stop-color="#2b6cb0" stop-opacity="0"/></radialGradient>
+  <linearGradient id="flow" gradientUnits="userSpaceOnUse" x1="200" y1="0" x2="420" y2="0"><stop offset="0" stop-color="#7b93b8"/><stop offset="1" stop-color="#4fe6c4"/></linearGradient>
+  <marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 10 5 0 10Z" fill="#4fe6c4"/></marker>
+  <linearGradient id="shield" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#123a40"/><stop offset="1" stop-color="#0a1b26"/></linearGradient>
+  <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse"><path d="M32 0H0V32" fill="none" stroke="#7fb4d6" stroke-opacity=".05"/></pattern>
+  <clipPath id="frame"><rect width="1280" height="440" rx="22"/></clipPath>
+  <style>
+    .f{font-family:Inter,'Segoe UI',Helvetica,Arial,sans-serif}
+    .flow{stroke-dasharray:6 8;animation:dash 1.6s linear infinite}
+    .ring{transform-origin:1062px 196px;animation:spin 40s linear infinite}
+    @keyframes dash{to{stroke-dashoffset:-28}}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    @media (prefers-reduced-motion:reduce){.flow,.ring{animation:none}}
+  </style>
 </defs>
-<rect width="1280" height="420" rx="20" fill="url(#bg)"/>
-<rect width="1280" height="420" rx="20" fill="url(#glow)"/>
-<rect width="1280" height="420" rx="20" fill="url(#dots)"/>
-<rect x="1" y="1" width="1278" height="418" rx="19" fill="none" stroke="#4c8190" stroke-opacity=".35"/>
-<circle cx="1044" cy="114" r="125" fill="#1bbaa9" opacity=".08" filter="url(#soft)"/>
-<path d="M62 78 H1214" stroke="#8ab3cd" stroke-opacity=".18"/>
-<g transform="translate(65 42)">
- <path d="M17 0 L34 13 L26 36 L9 36 L0 13 Z" fill="none" stroke="#4ce8c6" stroke-width="2.6"/>
- <path d="M8 18 L17 9 L26 18 L17 28 Z" fill="#4ce8c6" opacity=".9"/>
- <text x="51" y="28" fill="#f5f9ff" font-family="Inter,Arial,Helvetica,sans-serif" font-size="28" font-weight="750" letter-spacing=".8">QIE <tspan fill="#4ce8c6">SENTINEL</tspan></text>
+<g clip-path="url(#frame)">
+  <rect width="1280" height="440" fill="url(#bg)"/>
+  <rect width="1280" height="440" fill="url(#grid)"/>
+  <rect width="1280" height="440" fill="url(#glowL)"/>
+  <rect width="1280" height="440" fill="url(#glowR)"/>
 </g>
-<rect x="1049" y="39" width="166" height="25" rx="12.5" fill="#12362f" stroke="#287e6b"/>
-<circle cx="1065" cy="51.5" r="3.6" fill="#52efd0"/>
-<text x="1077" y="56" fill="#8ff2d5" font-family="Inter,Arial,Helvetica,sans-serif" font-size="11" font-weight="700" letter-spacing="1.1">QIE MAINNET · 1990</text>
-<text x="65" y="144" fill="#a5b7d1" font-family="Inter,Arial,Helvetica,sans-serif" font-size="12" font-weight="700" letter-spacing="3">VERIFIABLE AUTONOMOUS PAYMENT SECURITY</text>
-<text x="62" y="213" fill="url(#heading)" font-family="Inter,Arial,Helvetica,sans-serif" font-size="55" font-weight="800" letter-spacing="-2">Autonomous proposals.</text>
-<text x="62" y="274" fill="#56efcb" font-family="Inter,Arial,Helvetica,sans-serif" font-size="55" font-weight="800" letter-spacing="-2">Human-controlled funds.</text>
-<text x="65" y="316" fill="#b6c7db" font-family="Inter,Arial,Helvetica,sans-serif" font-size="17">The agent proposes. The owner authorizes. The blockchain enforces.</text>
-<g transform="translate(663 205)">
- <rect x="0" y="-13" width="552" height="139" rx="16" fill="#071321" stroke="#416479" stroke-opacity=".75"/>
- <text x="22" y="11" fill="#91afc4" font-family="Inter,Arial,Helvetica,sans-serif" font-size="10" font-weight="700" letter-spacing="2">SIGNED PAYMENT PATH</text>
- <path d="M55 71 H496" fill="none" stroke="url(#edge)" stroke-opacity=".7" stroke-width="2.5" stroke-dasharray="5 6"/>
- <g font-family="Inter,Arial,Helvetica,sans-serif" text-anchor="middle" font-size="10" font-weight="650">
-  <circle cx="55" cy="71" r="22" fill="#13283e" stroke="#80a7d0"/><text x="55" y="75" fill="#dfeaff">01</text><text x="55" y="112" fill="#bed2e4">AGENT</text>
-  <circle cx="165" cy="71" r="22" fill="#123441" stroke="#4ce8c6"/><path d="M156 70 L162 76 L174 63" stroke="#65f6d6" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="165" y="112" fill="#b5f9e9">POLICY</text>
-  <circle cx="275" cy="71" r="22" fill="#123441" stroke="#4ce8c6"/><path d="M267 71 L273 77 L283 64" stroke="#65f6d6" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="275" y="112" fill="#b5f9e9">OWNER</text>
-  <circle cx="385" cy="71" r="22" fill="#13283e" stroke="#80a7d0"/><text x="385" y="75" fill="#dfeaff">04</text><text x="385" y="112" fill="#bed2e4">EXECUTOR</text>
-  <circle cx="496" cy="71" r="22" fill="#123441" stroke="#4ce8c6"/><path d="M496 57 L509 64 L506 80 L496 86 L486 80 L483 64 Z" stroke="#65f6d6" stroke-width="1.8" fill="none"/><path d="M491 71 L496 76 L503 67" stroke="#65f6d6" stroke-width="1.8" fill="none"/><text x="496" y="112" fill="#b5f9e9">VAULT</text>
- </g>
+<rect x=".75" y=".75" width="1278.5" height="438.5" rx="21.5" fill="none" stroke="#5b8aa0" stroke-opacity=".32" stroke-width="1.5"/>
+
+<!-- header -->
+<g transform="translate(64 38)">
+  <path d="M16 0 32 9V24C32 33 25 39 16 42 7 39 0 33 0 24V9Z" fill="none" stroke="#4fe6c4" stroke-width="2.4" stroke-linejoin="round"/>
+  <path d="M9.5 21.5 14.5 26.5 23 16" fill="none" stroke="#4fe6c4" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+  <text class="f" x="46" y="29" fill="#eef4fc" font-size="25" font-weight="800" letter-spacing="1">QIE <tspan fill="#4fe6c4">SENTINEL</tspan></text>
 </g>
-<text x="65" y="383" fill="#8ca6bd" font-family="Inter,Arial,Helvetica,sans-serif" font-size="12" letter-spacing=".4">SOLIDITY VERIFIED  ·  EIP-712 APPROVAL  ·  QUSDC  ·  READ-ONLY LIVE SECURITY LAB</text>
+<g transform="translate(1008 44)">
+  <rect width="208" height="30" rx="15" fill="#0f2f2b" stroke="#2a8a74"/>
+  <circle cx="18" cy="15" r="4" fill="#4fe6c4"/>
+  <text class="f" x="31" y="20" fill="#9af3d9" font-size="12.5" font-weight="700" letter-spacing="1.2">QIE MAINNET · 1990</text>
+</g>
+
+<!-- headline block: left 64..760 -->
+<text class="f" x="66" y="130" fill="#8ea4c2" font-size="13" font-weight="700" letter-spacing="3">AI-AGENT PAYMENT SECURITY · HACKATHON 2026</text>
+<text class="f" x="62" y="190" fill="#f3f7fd" font-size="52" font-weight="800" letter-spacing="-1.2">Autonomous proposals.</text>
+<text class="f" x="62" y="250" fill="#4fe6c4" font-size="52" font-weight="800" letter-spacing="-1.2">Human-controlled funds.</text>
+<text class="f" x="65" y="290" fill="#a9b9cf" font-size="18">The agent proposes. The owner authorizes. The blockchain enforces.</text>
+
+<!-- emblem: right 950..1176 -->
+<g>
+  <circle cx="1062" cy="196" r="104" fill="none" stroke="#4fe6c4" stroke-opacity=".10" stroke-width="18"/>
+  <g class="ring">
+    <circle cx="1062" cy="196" r="88" fill="none" stroke="#4fe6c4" stroke-opacity=".45" stroke-width="1.5" stroke-dasharray="3 9"/>
+    <circle cx="1150" cy="196" r="5" fill="#4fe6c4"/>
+    <circle cx="974" cy="196" r="4" fill="#7b93b8"/>
+    <circle cx="1062" cy="108" r="3.5" fill="#4fe6c4" fill-opacity=".7"/>
+  </g>
+  <path d="M1062 128 1114 151V198C1114 230 1092 252 1062 264 1032 252 1010 230 1010 198V151Z" fill="url(#shield)" stroke="#4fe6c4" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M1062 146 1098 162V198C1098 221 1083 237 1062 246 1041 237 1026 221 1026 198V162Z" fill="none" stroke="#4fe6c4" stroke-opacity=".35" stroke-width="1.5" stroke-linejoin="round"/>
+  <path d="M1043 197 1056 210 1083 180" fill="none" stroke="#4fe6c4" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+
+<!-- signed payment path: full width strip -->
+<g transform="translate(64 318)">
+  <rect width="1152" height="96" rx="16" fill="#08121f" fill-opacity=".85" stroke="#3a5a72" stroke-opacity=".7"/>
+  <text class="f" x="24" y="27" fill="#7f97b5" font-size="11.5" font-weight="700" letter-spacing="2.4">SIGNED PAYMENT PATH</text>
+  <text class="f" x="1128" y="27" fill="#7f97b5" font-size="11.5" font-weight="700" letter-spacing="1.6" text-anchor="end">SOLIDITY VERIFIED · EIP-712 · QUSDC</text>
+  <path class="flow" d="M222 60H326" fill="none" stroke="url(#flow)" stroke-width="2.5" marker-end="url(#ah)"/>
+  <path class="flow" d="M498 60H552" fill="none" stroke="url(#flow)" stroke-width="2.5" marker-end="url(#ah)"/>
+  <path class="flow" d="M712 60H778" fill="none" stroke="url(#flow)" stroke-width="2.5" marker-end="url(#ah)"/>
+  <path class="flow" d="M934 60H1004" fill="none" stroke="url(#flow)" stroke-width="2.5" marker-end="url(#ah)"/>
+  <g class="f" font-size="14" font-weight="800" letter-spacing="1">
+    <!-- 1 agent (untrusted) -->
+    <circle cx="126" cy="60" r="15" fill="#141f33" stroke="#7b93b8" stroke-width="2"/>
+    <text x="126" y="65" fill="#c8d4e6" font-size="12" text-anchor="middle">AI</text>
+    <text x="152" y="57" fill="#dde6f3">AGENT</text>
+    <text x="152" y="76" fill="#7f97b5" font-size="12" font-weight="600" letter-spacing=".3">proposes</text>
+    <!-- 2 policy -->
+    <circle cx="352" cy="60" r="15" fill="#0f2f2b" stroke="#4fe6c4" stroke-width="2"/>
+    <path d="M345 60 350 65 359 55" fill="none" stroke="#4fe6c4" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="378" y="57" fill="#dde6f3">POLICY</text>
+    <text x="378" y="76" fill="#7f97b5" font-size="12" font-weight="600" letter-spacing=".3">preflight check</text>
+    <!-- 3 owner -->
+    <circle cx="578" cy="60" r="15" fill="#0f2f2b" stroke="#4fe6c4" stroke-width="2"/>
+    <path d="M571 60 576 65 585 55" fill="none" stroke="#4fe6c4" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="604" y="57" fill="#dde6f3">OWNER</text>
+    <text x="604" y="76" fill="#7f97b5" font-size="12" font-weight="600" letter-spacing=".3">signs EIP-712</text>
+    <!-- 4 executor -->
+    <circle cx="804" cy="60" r="15" fill="#0f2f2b" stroke="#4fe6c4" stroke-width="2"/>
+    <path d="M797 60 802 65 811 55" fill="none" stroke="#4fe6c4" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="830" y="57" fill="#dde6f3">EXECUTOR</text>
+    <text x="830" y="76" fill="#7f97b5" font-size="12" font-weight="600" letter-spacing=".3">separate key</text>
+    <!-- 5 vault -->
+    <circle cx="1030" cy="60" r="17" fill="#4fe6c4"/>
+    <path d="M1030 49 1039 53V60C1039 66 1035 70 1030 72 1025 70 1021 66 1021 60V53Z" fill="none" stroke="#06231f" stroke-width="2.2" stroke-linejoin="round"/>
+    <text x="1056" y="57" fill="#eef4fc">VAULT</text>
+    <text x="1056" y="76" fill="#7f97b5" font-size="12" font-weight="600" letter-spacing=".3">enforces</text>
+  </g>
+</g>
 </svg>
