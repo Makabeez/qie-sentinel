@@ -1,14 +1,28 @@
-# QIE Sentinel — Autonomous proposals. Human-controlled funds.
+<div align="center">
 
-**QIE Digital Hackathon 2026 · QIE Mainnet (chain ID 1990)**
+![QIE Sentinel — Autonomous proposals, human-controlled funds](assets/qie-sentinel-banner.svg)
 
-[**Public live read-only security lab**](https://qie-sentinel-peach.vercel.app/#demo) · [**Verified SentinelVault**](https://mainnet.qie.digital/address/0xb752F05a55059C89a43a289d5d055F303B6DD96E?tab=contract) · [**Verified PolicyGuard**](https://mainnet.qie.digital/address/0x532Ee81939386E23b8c58076e643D9FCe489F15C?tab=contract) · [**Demo video (2:59)**](https://youtu.be/GedB5dSSj8g)
+**Source-verified on QIE Mainnet · AI + Autonomous Agents · Hackathon 2026**
+
+[![Solidity](https://img.shields.io/badge/Solidity-0.8.24-34495e?logo=solidity)](foundry.toml)
+[![QIE Mainnet](https://img.shields.io/badge/QIE_Mainnet-chain_1990-0cae97)](https://mainnet.qie.digital/)
+[![Contracts verified](https://img.shields.io/badge/Source-Verified-1aa98b)](https://mainnet.qie.digital/address/0xb752F05a55059C89a43a289d5d055F303B6DD96E?tab=contract)
+[![Foundry CI](https://github.com/Makabeez/qie-sentinel/actions/workflows/foundry.yml/badge.svg)](https://github.com/Makabeez/qie-sentinel/actions/workflows/foundry.yml)
+[![Agent CI](https://github.com/Makabeez/qie-sentinel/actions/workflows/agent-ci.yml/badge.svg)](https://github.com/Makabeez/qie-sentinel/actions/workflows/agent-ci.yml)
+
+**[Live security lab](https://qie-sentinel-peach.vercel.app/#demo)** · **[Watch 2:59 demo](https://youtu.be/GedB5dSSj8g)** · **[On-chain receipts](https://qie-sentinel-peach.vercel.app/#proof)** · **[Architecture](docs/ARCHITECTURE.md)** · **[Security disclosures](docs/SECURITY.md)**
+
+</div>
+
+## The problem
+
+AI agents can propose payments. They should not hold unilateral authority to spend funds. QIE Sentinel demonstrates a narrow, auditable boundary between **agent proposals**, **human signatures**, and **on-chain enforcement**.
 
 QIE Sentinel is a QUSDC-only, human-authorized AI-agent payment prototype. A local agent interprets payment requests and proposes transactions. Deterministic policy checks reject invalid requests before signing. A separate owner signs an **exact EIP-712 payment intent**; an independent executor submits it to the verified Solidity vault, which checks executor, expiry, QUSDC token, nonce, signature, PolicyGuard budget/allowlist and transfer before settlement.
 
 **Scope:** hackathon MVP, not independently audited, not a production wallet or an unattended treasury manager. The public site does not hold keys, authorize payments, or access the private local dashboard.
 
-## Independent evidence — QIE Mainnet
+## Verified QIE Mainnet deployment
 
 Both contracts have **Contract Source Code Verified** status on the QIE explorer as of **21 November 2026**. Source verification establishes a match to deployed bytecode; it is **not** a security audit.
 
@@ -33,7 +47,7 @@ Both contracts have **Contract Source Code Verified** status on the QIE explorer
 
 **Evidence limitation:** These three payments total **0.45 QUSDC** and went to the **same allowlisted wallet** (`0xce99cF8EdfD199dB02b830445d89E746B8c1C7ff`). They prove the payment mechanism executes on mainnet, **not** independent user adoption, a customer base, or meaningful transactional traction. Emergency recovery is implemented and tested locally, but no recovery transaction is claimed on mainnet. Displayed historical receipt counts are not a live vault balance.
 
-## Live read-only security lab
+## Interactive security lab
 
 The [public website](https://qie-sentinel-peach.vercel.app/#demo) has **five** browser scenarios. They make **real read-only QIE Mainnet RPC requests** and never request a signature or broadcast a payment:
 
@@ -47,7 +61,7 @@ The [public website](https://qie-sentinel-peach.vercel.app/#demo) has **five** b
 
 **Important distinctions:** RPC `eth_call` reverts are **not reverted mined transactions**. Nonce and expiry results are **read-only assessments using mainnet state**, not signed `execute()` attempts. The vault checks the signature before calling PolicyGuard; an invalid unsigned `execute()` would not prove each individual policy rejection. RPC failures produce **unavailable**, not a fabricated result.
 
-## Agent and signing workflow
+## Agent → human → blockchain
 
 ```text
 Local payment task → deterministic interpreter → live policy preflight
@@ -66,9 +80,9 @@ Local payment task → deterministic interpreter → live policy preflight
 
 A read-only public demonstration of policy checks **is not the full agent UI**. The agent and its audit history run locally at `127.0.0.1:8765`; this private service must never be exposed to the public internet. The nonce-2 mainnet transaction above documents a completed local proposal→approval→execution workflow. The optional OpenAI risk adviser only provides explanations with explicit consent and cannot change policy or sign.
 
-See [architecture and limitations](docs/ARCHITECTURE.md), [security disclosures](docs/SECURITY.md), [video handoff](docs/VIDEO_HANDOFF.md), and [submission checklist](docs/SUBMISSION.md).
+Read the [architecture and trust boundaries](docs/ARCHITECTURE.md), [security disclosures](docs/SECURITY.md), or [recorded demonstration](https://youtu.be/GedB5dSSj8g).
 
-## Development and testing
+## Build and test locally
 
 - Solidity **0.8.24**, OpenZeppelin **5.0.2**, Forge Std **1.9.7**, `evm_version="paris"`.
 - Foundry unit, fuzz, invariant and adversarial tests; Python unit tests; GitHub Actions workflows for both. [CI status](https://github.com/Makabeez/qie-sentinel/actions).
@@ -99,4 +113,4 @@ The exported local JSON contains transaction/proposal data and may be sensitive;
 
 Vercel project: **`site/` as Root Directory**, framework preset `Other`, no backend, no environment variables. `site/app.js` performs limited public read-only RPC calls. Do not deploy `sentinel-agent/server.py`, SQLite, encrypted keystores, or local environment files.
 
-**Closing principle: The agent proposes. The owner authorizes. The blockchain enforces.**
+**The agent proposes. The owner authorizes. The blockchain enforces.**
