@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="420" viewBox="0 0 1280 420" role="img" aria-labelledby="title desc">
+<title id="title">QIE Sentinel — Autonomous proposals. Human-controlled funds.</title>
+<desc id="desc">Dark technology banner with a protected five-stage payment path: Agent, Policy, Owner, Executor, Vault; QIE Mainnet chain 1990.</desc>
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#080e1d"/><stop offset=".56" stop-color="#101c31"/><stop offset="1" stop-color="#07151b"/></linearGradient>
+  <radialGradient id="glow" cx="72%" cy="43%" r="75%"><stop stop-color="#143f4e" stop-opacity=".66"/><stop offset="1" stop-color="#143f4e" stop-opacity="0"/></radialGradient>
+  <linearGradient id="edge" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#4ce8c6"/><stop offset="1" stop-color="#71b6f5"/></linearGradient>
+  <linearGradient id="heading" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#f6faff"/><stop offset="1" stop-color="#a9e9e0"/></linearGradient>
+  <pattern id="dots" width="26" height="26" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1" fill="#9fdef0" opacity=".13"/></pattern>
+  <filter id="soft"><feGaussianBlur stdDeviation="25"/></filter>
+</defs>
+<rect width="1280" height="420" rx="20" fill="url(#bg)"/>
+<rect width="1280" height="420" rx="20" fill="url(#glow)"/>
+<rect width="1280" height="420" rx="20" fill="url(#dots)"/>
+<rect x="1" y="1" width="1278" height="418" rx="19" fill="none" stroke="#4c8190" stroke-opacity=".35"/>
+<circle cx="1044" cy="114" r="125" fill="#1bbaa9" opacity=".08" filter="url(#soft)"/>
+<path d="M62 78 H1214" stroke="#8ab3cd" stroke-opacity=".18"/>
+<g transform="translate(65 42)">
+ <path d="M17 0 L34 13 L26 36 L9 36 L0 13 Z" fill="none" stroke="#4ce8c6" stroke-width="2.6"/>
+ <path d="M8 18 L17 9 L26 18 L17 28 Z" fill="#4ce8c6" opacity=".9"/>
+ <text x="51" y="28" fill="#f5f9ff" font-family="Inter,Arial,Helvetica,sans-serif" font-size="28" font-weight="750" letter-spacing=".8">QIE <tspan fill="#4ce8c6">SENTINEL</tspan></text>
+</g>
+<rect x="1049" y="39" width="166" height="25" rx="12.5" fill="#12362f" stroke="#287e6b"/>
+<circle cx="1065" cy="51.5" r="3.6" fill="#52efd0"/>
+<text x="1077" y="56" fill="#8ff2d5" font-family="Inter,Arial,Helvetica,sans-serif" font-size="11" font-weight="700" letter-spacing="1.1">QIE MAINNET · 1990</text>
+<text x="65" y="144" fill="#a5b7d1" font-family="Inter,Arial,Helvetica,sans-serif" font-size="12" font-weight="700" letter-spacing="3">VERIFIABLE AUTONOMOUS PAYMENT SECURITY</text>
+<text x="62" y="213" fill="url(#heading)" font-family="Inter,Arial,Helvetica,sans-serif" font-size="55" font-weight="800" letter-spacing="-2">Autonomous proposals.</text>
+<text x="62" y="274" fill="#56efcb" font-family="Inter,Arial,Helvetica,sans-serif" font-size="55" font-weight="800" letter-spacing="-2">Human-controlled funds.</text>
+<text x="65" y="316" fill="#b6c7db" font-family="Inter,Arial,Helvetica,sans-serif" font-size="17">The agent proposes. The owner authorizes. The blockchain enforces.</text>
+<g transform="translate(663 205)">
+ <rect x="0" y="-13" width="552" height="139" rx="16" fill="#071321" stroke="#416479" stroke-opacity=".75"/>
+ <text x="22" y="11" fill="#91afc4" font-family="Inter,Arial,Helvetica,sans-serif" font-size="10" font-weight="700" letter-spacing="2">SIGNED PAYMENT PATH</text>
+ <path d="M55 71 H496" fill="none" stroke="url(#edge)" stroke-opacity=".7" stroke-width="2.5" stroke-dasharray="5 6"/>
+ <g font-family="Inter,Arial,Helvetica,sans-serif" text-anchor="middle" font-size="10" font-weight="650">
+  <circle cx="55" cy="71" r="22" fill="#13283e" stroke="#80a7d0"/><text x="55" y="75" fill="#dfeaff">01</text><text x="55" y="112" fill="#bed2e4">AGENT</text>
+  <circle cx="165" cy="71" r="22" fill="#123441" stroke="#4ce8c6"/><path d="M156 70 L162 76 L174 63" stroke="#65f6d6" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="165" y="112" fill="#b5f9e9">POLICY</text>
+  <circle cx="275" cy="71" r="22" fill="#123441" stroke="#4ce8c6"/><path d="M267 71 L273 77 L283 64" stroke="#65f6d6" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="275" y="112" fill="#b5f9e9">OWNER</text>
+  <circle cx="385" cy="71" r="22" fill="#13283e" stroke="#80a7d0"/><text x="385" y="75" fill="#dfeaff">04</text><text x="385" y="112" fill="#bed2e4">EXECUTOR</text>
+  <circle cx="496" cy="71" r="22" fill="#123441" stroke="#4ce8c6"/><path d="M496 57 L509 64 L506 80 L496 86 L486 80 L483 64 Z" stroke="#65f6d6" stroke-width="1.8" fill="none"/><path d="M491 71 L496 76 L503 67" stroke="#65f6d6" stroke-width="1.8" fill="none"/><text x="496" y="112" fill="#b5f9e9">VAULT</text>
+ </g>
+</g>
+<text x="65" y="383" fill="#8ca6bd" font-family="Inter,Arial,Helvetica,sans-serif" font-size="12" letter-spacing=".4">SOLIDITY VERIFIED  ·  EIP-712 APPROVAL  ·  QUSDC  ·  READ-ONLY LIVE SECURITY LAB</text>
+</svg>
