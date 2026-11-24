@@ -170,9 +170,14 @@ function resetPlan(){
  $('plan-title').textContent='No plan generated';
  $('plan-summary').textContent='A valid plan can be exported, but this prototype cannot deploy a vault.';
 }
-$('vault-plan').addEventListener('submit',async event=>{
- event.preventDefault();
+async function generatePlan(event){
+ event?.preventDefault();
  resetPlan();
+ const button=$('generate-plan');
+ button.disabled=true;
+ $('plan-feedback').textContent='Validating configuration locally…';
+ $('plan-title').textContent='Checking your inputs';
+ $('plan-summary').textContent='No transaction or signature will be requested.';
  try {
   if(!viewer||!provider)throw new Error('Connect your QIE Mainnet wallet first. No signature is requested.');
   // Re-check chain and account without any additional wallet permissions or signing.
@@ -207,11 +212,18 @@ $('vault-plan').addEventListener('submit',async event=>{
    el.append(a,b);$('plan-facts').append(el);
   }
   $('download-plan').disabled=false;
+  $('plan-feedback').textContent='Configuration valid. You can download this local-only plan JSON.';
  }catch(err){
+  const message=String(err?.message||err);
   $('plan-title').textContent='Configuration rejected';
-  $('plan-summary').textContent=String(err.message||err);
+  $('plan-summary').textContent=message;
+  $('plan-feedback').textContent='Action needed: '+message;
+ }finally{
+  button.disabled=false;
  }
-});
+}
+$('generate-plan').addEventListener('click',generatePlan);
+$('vault-plan').addEventListener('submit',generatePlan);
 $('download-plan').addEventListener('click',()=>{
  if(!plan)return;
  const blob=new Blob([JSON.stringify(plan,null,2)+'\n'],{type:'application/json'});
