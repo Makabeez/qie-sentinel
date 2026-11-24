@@ -24,3 +24,13 @@ test('browser is explicit about demo-vault boundaries',()=>{
  for(const disclosure of ['NOT DEPLOYED','No transaction capability','existing demonstration vault','does not bind this field'])
   assert.ok(html.includes(disclosure),disclosure);
 });
+
+test('deployment preview always has a clickable control and visible feedback',()=>{
+ const html=read('./index.html');
+ const app=read('./app.mjs');
+ assert.match(html,/id="generate-plan" type="button"/);
+ assert.match(html,/id="plan-feedback" role="status"/);
+ assert.match(app,/\$\('generate-plan'\)\.addEventListener\('click',generatePlan\)/);
+ assert.match(app,/\$\('plan-feedback'\)\.textContent='Action needed: '/);
+ assert.match(app,/button\.disabled=false/);
+});
