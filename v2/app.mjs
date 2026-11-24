@@ -170,11 +170,19 @@ function resetPlan(){
  $('plan-title').textContent='No plan generated';
  $('plan-summary').textContent='A valid plan can be exported, but this prototype cannot deploy a vault.';
 }
-$('vault-plan').addEventListener('submit',event=>{
+$('vault-plan').addEventListener('submit',async event=>{
  event.preventDefault();
  resetPlan();
  try {
-  if(!viewer)throw new Error('Connect your QIE Mainnet wallet first. No signature is requested.');
+  if(!viewer||!provider)throw new Error('Connect your QIE Mainnet wallet first. No signature is requested.');
+  // Re-check chain and account without any additional wallet permissions or signing.
+  const [activeChain,activeAccounts]=await Promise.all([
+   provider.request({method:'eth_chainId'}),
+   provider.request({method:'eth_accounts'})
+  ]);
+  if(BigInt(activeChain)!==1990n)throw new Error('Wallet is no longer on QIE Mainnet (1990). Reconnect first.');
+  if(!Array.isArray(activeAccounts)||!activeAccounts.some(a=>typeof a==='string'&&a.toLowerCase()===viewer.toLowerCase()))
+   throw new Error('Connected wallet identity changed. Reconnect before making a deployment preview.');
   plan=deploymentPreview({
    owner:viewer,
    executor:$('new-executor').value.trim(),
