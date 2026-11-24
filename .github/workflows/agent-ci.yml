@@ -26,4 +26,4 @@ jobs:
       - name: QIE Sentinel v2 read-only policy tests
         run: |
           node --check v2/app.mjs
-          node --test v2/test-policy.mjs v2/test-onboarding.mjs
+          node --test v2/test-*.mjs
