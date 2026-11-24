@@ -1,3 +1,4 @@
+import {deploymentPreview} from './onboarding.mjs';
 import {NETWORK,SELECTORS,amountToUnits,unitsToAmount,validAddress,encodedCall,assess,reasonForRevert,proposalEvidence} from './policy.mjs';
 
 const $=id=>document.getElementById(id);
@@ -20,14 +21,14 @@ $('connect').addEventListener('click',async()=>{
   const chain=await provider.request({method:'eth_chainId'});
   if(BigInt(chain)!==1990n){viewer=null;throw new Error('Connected wallet is on another network. Switch to QIE Mainnet (chain 1990) in your wallet. No network switch was requested.');}
   if(!accounts?.length||!validAddress(accounts[0]))throw new Error('Wallet returned no usable address.');
-  viewer=accounts[0];showConnection();
+  viewer=accounts[0];showConnection();$('new-owner').value=viewer;resetPlan();
   clearReport();
   setStatus('Wallet identified','Connected account: '+viewer+'. This identity does not grant control over the demonstration vault.','warn');
  }catch(e){viewer=null;showConnection();setStatus('Wallet connection unavailable',String(e.message||e),'warn');}
  finally{$('connect').disabled=false;}
 });
 provider?.on?.('accountsChanged',()=>{
- viewer=null;showConnection();clearReport();
+ viewer=null;showConnection();clearReport();$('new-owner').value='';resetPlan();
  setStatus('Wallet context changed','Reconnect to attach your current wallet address to a new review.','warn');
 });
 provider?.on?.('chainChanged',()=>{
@@ -158,4 +159,55 @@ $('copy').addEventListener('click',async()=>{
  if(!report)return;
  try{await navigator.clipboard.writeText(JSON.stringify(report,null,2));$('copy').textContent='Copied ✓'}
  catch{$('copy').textContent='Clipboard unavailable'}
+});
+
+
+let plan=null;
+function resetPlan(){
+ plan=null;
+ $('download-plan').disabled=true;
+ $('plan-facts').replaceChildren();
+ $('plan-title').textContent='No plan generated';
+ $('plan-summary').textContent='A valid plan can be exported, but this prototype cannot deploy a vault.';
+}
+$('vault-plan').addEventListener('submit',event=>{
+ event.preventDefault();
+ resetPlan();
+ try {
+  if(!viewer)throw new Error('Connect your QIE Mainnet wallet first. No signature is requested.');
+  plan=deploymentPreview({
+   owner:viewer,
+   executor:$('new-executor').value.trim(),
+   maxPerPayment:$('new-max').value.trim(),
+   dailyLimit:$('new-daily').value.trim()
+  });
+  $('plan-title').textContent='Valid configuration — deployment NOT available';
+  $('plan-summary').textContent='Preview only. No contract, authorization, transaction or escrow has been created. An independent security review is required before deployment.';
+  const rows=[
+   ['Owner',plan.owner],
+   ['Executor',plan.executor],
+   ['Token',plan.token],
+   ['Per-transfer cap',plan.maxPerTransferQUSDC+' QUSDC'],
+   ['Daily cap',plan.dailyLimitQUSDC+' QUSDC'],
+   ['Initial allowlist','Empty · default deny'],
+   ['Factory status','Experimental · not deployed']
+  ];
+  for(const [name,value] of rows){
+   const el=document.createElement('div');el.className='fact';
+   const a=document.createElement('span');a.textContent=name;
+   const b=document.createElement('strong');b.textContent=value;
+   el.append(a,b);$('plan-facts').append(el);
+  }
+  $('download-plan').disabled=false;
+ }catch(err){
+  $('plan-title').textContent='Configuration rejected';
+  $('plan-summary').textContent=String(err.message||err);
+ }
+});
+$('download-plan').addEventListener('click',()=>{
+ if(!plan)return;
+ const blob=new Blob([JSON.stringify(plan,null,2)+'\n'],{type:'application/json'});
+ const url=URL.createObjectURL(blob),a=document.createElement('a');
+ a.href=url;a.download='sentinel-v2-deployment-preview.json';a.click();
+ setTimeout(()=>URL.revokeObjectURL(url),1000);
 });
