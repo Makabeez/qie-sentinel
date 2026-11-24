@@ -17,7 +17,7 @@ cd /mnt/c/Github/qie-sentinel
 git fetch origin
 git worktree add /mnt/c/Github/qie-sentinel-v2 feat/v2-owner-approval
 cd /mnt/c/Github/qie-sentinel-v2
-node --test v2/test-policy.mjs
+node --test v2/test-*.mjs
 node --check v2/app.mjs
 python3 -m http.server 8766 --bind 127.0.0.1
 # Browse http://127.0.0.1:8766/v2/
@@ -41,6 +41,24 @@ Review the JSON download, especially `disclaimer`, `block`, `viewer`, and `resul
 node --test v2/test-policy.mjs
 node --check v2/app.mjs
 python3 scripts/check-public-site.py
+```
+
+## v2.1 independent vault planning (experimental)
+
+The page now includes a **user-owned vault configuration preview**. Connect a QIE Mainnet EVM wallet (account identity only), enter a **different** executor wallet, and set a per-transfer and UTC-day QUSDC limit. The form checks address validity, owner/executor separation, amount precision and spending constraints and downloads a `PREVIEW_ONLY_NOT_DEPLOYED` JSON file.
+
+A separate Solidity contract, [`SentinelVaultFactory`](../src/SentinelVaultFactory.sol), creates a new `SentinelVault` and `PolicyGuard` for each caller. This factory is **source code only** and has **not been deployed**. It neither funds nor administers a user's vault. The project's existing v1.1 vault is unchanged.
+
+Check the [v2.1 threat model](THREAT_MODEL.md), especially factory/token identity, signature authority, cross-user isolation, and required audits.
+
+```bash
+cd /mnt/c/Github/qie-sentinel-v2
+node --test v2/test-*.mjs
+node --check v2/app.mjs
+export PATH="$HOME/.foundry/bin:$PATH"
+forge fmt --check
+forge build
+forge test --match-contract SentinelVaultFactoryTest -vv
 ```
 
 ## Next development stage (not yet implemented)
