@@ -48,8 +48,12 @@ contract SentinelVaultFactoryTest is Test {
         assertEq(b.guard().maxPerTransfer(), 2e6);
         assertEq(factory.deployedCount(alice), 1);
         assertEq(factory.deployedCount(bob), 1);
-        assertEq(factory.getDeployedVaults(alice)[0], first);
-        assertEq(factory.getDeployedVaults(bob)[0], second);
+        address[] memory firstOwnerVaults = factory.getDeployedVaults(alice);
+        address[] memory secondOwnerVaults = factory.getDeployedVaults(bob);
+        assertEq(firstOwnerVaults.length, 1);
+        assertEq(secondOwnerVaults.length, 1);
+        assertEq(firstOwnerVaults[0], first);
+        assertEq(secondOwnerVaults[0], second);
         assertEq(a.balance(), 0);
         assertEq(b.balance(), 0);
     }
