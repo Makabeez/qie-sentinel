@@ -33,6 +33,32 @@
 <div id="facts" class="facts" aria-live="polite"></div>
 <div class="actions"><button type="button" id="export" class="button quiet" disabled>Download review JSON</button><button type="button" id="copy" class="button quiet" disabled>Copy review</button></div>
 </section></div>
+<section class="panel onboarding">
+ <div class="panel-header"><span class="eyebrow">05 / USER-OWNED VAULT · DESIGN PREVIEW</span><span class="live">NOT DEPLOYED</span></div>
+ <div class="onboarding-intro"><h2>Design your own vault.</h2><p>Build a deployment configuration for a wallet-owned QUSDC vault. The factory contract is still experimental and has <strong>not</strong> been deployed. This form never requests a signature or sends a transaction.</p></div>
+ <div class="onboarding-grid">
+  <form id="vault-plan" class="onboarding-form" novalidate>
+   <label for="new-owner">Proposed vault owner</label>
+   <input id="new-owner" type="text" readonly placeholder="Connect wallet above to identify owner">
+   <small>New vault ownership will belong to the creating wallet. Wallet connection alone does not deploy a vault.</small>
+   <label for="new-executor">Executor wallet address</label>
+   <input id="new-executor" type="text" required autocomplete="off" spellcheck="false" placeholder="0x… (different from owner)">
+   <small>This distinct wallet can only submit intents independently signed by the owner.</small>
+   <div class="cols">
+    <div><label for="new-max">Maximum per payment (QUSDC)</label><input id="new-max" type="text" value="0.10" required inputmode="decimal"></div>
+    <div><label for="new-daily">Daily budget (QUSDC)</label><input id="new-daily" type="text" value="2.00" required inputmode="decimal"></div>
+   </div>
+   <button class="button primary" type="submit">Generate deployment preview →</button>
+  </form>
+  <div class="plan-preview" aria-live="polite">
+   <span class="eyebrow">LOCAL DEPLOYMENT PLAN</span>
+   <h3 id="plan-title">No plan generated</h3>
+   <p id="plan-summary">Connect an EVM wallet, choose a separate executor and set spending limits. A valid plan can be downloaded as JSON, but cannot be deployed here.</p>
+   <div id="plan-facts" class="facts"></div>
+   <button class="button quiet" id="download-plan" type="button" disabled>Download plan JSON</button>
+  </div>
+ </div>
+</section>
 <section class="footgrid"><article><span class="eyebrow">03 / TRUST BOUNDARY</span><h3>What this does</h3><p>Reads vault pause state, PolicyGuard limits, the proposed nonce, latest block time and QUSDC balance. Displays block-specific evidence for a reviewer.</p></article><article><span class="eyebrow">04 / NOT YET BUILT</span><h3>True independent onboarding</h3><p>User-controlled vault deployment, EIP-712 signing, dedicated policy management, and execution are intentionally out of scope here. Those features need separate contracts, threat modeling and audit.</p></article></section>
 </main>
 <footer><span>QIE Sentinel 2.0 · Prototype, unaudited · No custody</span><span><a href="https://github.com/Makabeez/qie-sentinel" rel="noopener noreferrer" target="_blank">Source ↗</a> · <a href="https://mainnet.qie.digital/address/0xb752F05a55059C89a43a289d5d055F303B6DD96E?tab=contract" rel="noopener noreferrer" target="_blank">Verified vault ↗</a></span></footer>
