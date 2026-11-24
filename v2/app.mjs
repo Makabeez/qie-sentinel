@@ -180,14 +180,10 @@ async function generatePlan(event){
  $('plan-summary').textContent='No transaction or signature will be requested.';
  try {
   if(!viewer||!provider)throw new Error('Connect your QIE Mainnet wallet first. No signature is requested.');
-  // Re-check chain and account without any additional wallet permissions or signing.
-  const [activeChain,activeAccounts]=await Promise.all([
-   provider.request({method:'eth_chainId'}),
-   provider.request({method:'eth_accounts'})
-  ]);
-  if(BigInt(activeChain)!==1990n)throw new Error('Wallet is no longer on QIE Mainnet (1990). Reconnect first.');
-  if(!Array.isArray(activeAccounts)||!activeAccounts.some(a=>typeof a==='string'&&a.toLowerCase()===viewer.toLowerCase()))
-   throw new Error('Connected wallet identity changed. Reconnect before making a deployment preview.');
+  // Local-only configuration preview. Do not block on injected wallet RPC calls:
+  // some providers leave eth_accounts/eth_chainId requests pending indefinitely.
+  // viewer was identified on chain 1990 at initial connection, but a preview
+  // is NOT evidence of current chain/account state or authorization.
   plan=deploymentPreview({
    owner:viewer,
    executor:$('new-executor').value.trim(),
@@ -195,7 +191,7 @@ async function generatePlan(event){
    dailyLimit:$('new-daily').value.trim()
   });
   $('plan-title').textContent='Valid configuration — deployment NOT available';
-  $('plan-summary').textContent='Preview only. No contract, authorization, transaction or escrow has been created. An independent security review is required before deployment.';
+  $('plan-summary').textContent='Preview only. Uses the wallet identity captured at connection; live identity must be independently rechecked before any actual deployment. No contract, authorization, transaction or escrow has been created.';
   const rows=[
    ['Owner',plan.owner],
    ['Executor',plan.executor],
@@ -212,7 +208,7 @@ async function generatePlan(event){
    el.append(a,b);$('plan-facts').append(el);
   }
   $('download-plan').disabled=false;
-  $('plan-feedback').textContent='Configuration valid. You can download this local-only plan JSON.';
+  $('plan-feedback').textContent='Configuration valid. Download the local JSON plan below. Wallet signing and deployment are disabled.';
  }catch(err){
   const message=String(err?.message||err);
   $('plan-title').textContent='Configuration rejected';
