@@ -90,6 +90,15 @@ contract SentinelVaultFactoryTest is Test {
         ));
         vm.prank(address(factory));
         vault.pause();
+
+        // Even when the real owner pauses the vault, the factory cannot recover funds.
+        vm.prank(alice);
+        vault.pause();
+        vm.expectRevert(abi.encodeWithSelector(
+            Ownable.OwnableUnauthorizedAccount.selector, address(factory)
+        ));
+        vm.prank(address(factory));
+        vault.emergencyRecover(address(factory), 300000);
         assertEq(vault.balance(), 300000);
     }
 
