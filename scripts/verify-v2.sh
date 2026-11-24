@@ -18,7 +18,8 @@ echo "[3/6] Public v1.1 site regression"
 python3 scripts/check-public-site.py
 echo "[4/6] No sensitive files tracked"
 bash scripts/check-publish.sh
-echo "[5/6] Solidity compile (no deployment)"
+echo "[5/6] Install pinned Foundry dependencies and compile (no deployment)"
+bash scripts/install-deps.sh
 forge build
 echo "[6/6] Independent-owner factory isolation tests"
 forge test --match-contract SentinelVaultFactoryTest -vv
