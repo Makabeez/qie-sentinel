@@ -42,7 +42,8 @@ export function assess({paused,validated,nonceUsed,deadline,blockTime,balance,am
  if(paused)reasons.push('Vault is paused');
  if(!validated)reasons.push('PolicyGuard rejected recipient, amount or budget');
  if(nonceUsed)reasons.push('Nonce already used');
- if(BigInt(deadline)<=BigInt(blockTime))reasons.push('Intent deadline has expired');
+ // SentinelVault.execute checks block.timestamp > deadline, so equality remains valid.
+ if(BigInt(deadline)<BigInt(blockTime))reasons.push('Intent deadline has expired');
  if(BigInt(amount)>BigInt(balance))reasons.push('Insufficient demonstration vault QUSDC balance');
  return {eligible:reasons.length===0,reasons};
 }
