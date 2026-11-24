@@ -11,13 +11,17 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 contract SentinelVaultFactoryTest is Test {
     MockQUSDC internal token;
     SentinelVaultFactory internal factory;
-    address internal alice = address(0xA11CE);
-    address internal bob = address(0xB0B);
+    uint256 internal constant ALICE_KEY = 0xA11CE;
+    uint256 internal constant BOB_KEY = 0xB0B;
+    address internal alice;
+    address internal bob;
     address internal executorAlice = address(0xE01);
     address internal executorBob = address(0xE02);
     address internal beneficiary = address(0xABCD);
 
     function setUp() public {
+        alice = vm.addr(ALICE_KEY);
+        bob = vm.addr(BOB_KEY);
         token = new MockQUSDC();
         factory = new SentinelVaultFactory(address(token));
     }
@@ -83,6 +87,60 @@ contract SentinelVaultFactoryTest is Test {
         vm.prank(address(factory));
         vault.pause();
         assertEq(vault.balance(), 300000);
+    }
+
+    function testCrossUserCannotSignForAnotherOwnersVault() public {
+        vm.prank(alice);
+        SentinelVault a = SentinelVault(factory.createVault(executorAlice, 1e6, 5e6));
+        vm.prank(bob);
+        SentinelVault b = SentinelVault(factory.createVault(executorBob, 1e6, 5e6));
+
+        vm.prank(alice);
+        a.setRecipient(beneficiary, true);
+        vm.prank(bob);
+        b.setRecipient(beneficiary, true);
+        token.mint(address(a), 2e6);
+        token.mint(address(b), 2e6);
+
+        SentinelVault.Payment memory payment = SentinelVault.Payment({
+            token: address(token),
+            recipient: beneficiary,
+            amount: 300000,
+            nonce: 12,
+            deadline: block.timestamp + 1 hours,
+            executor: executorAlice
+        });
+
+        // Bob's valid EOA signature must not be accepted in Alice's vault.
+        (uint8 v, bytes32 r, bytes32 ss) = vm.sign(BOB_KEY, a.paymentDigest(payment));
+        bytes memory wrongOwnerSig = abi.encodePacked(r, ss, v);
+        vm.expectRevert(SentinelVault.InvalidSignature.selector);
+        vm.prank(executorAlice);
+        a.execute(payment, wrongOwnerSig);
+        assertFalse(a.isNonceUsed(12));
+        assertEq(a.balance(), 2e6);
+
+        // Alice signs the same precise intent for Alice's vault.
+        (v, r, ss) = vm.sign(ALICE_KEY, a.paymentDigest(payment));
+        bytes memory ownerSig = abi.encodePacked(r, ss, v);
+        vm.prank(executorAlice);
+        a.execute(payment, ownerSig);
+        assertEq(a.balance(), 1700000);
+        assertTrue(a.isNonceUsed(12));
+        assertEq(b.balance(), 2e6);
+        assertFalse(b.isNonceUsed(12));
+
+        // Alice's valid signature for her own vault cannot be replayed in Bob's
+        // vault, even if the executor field is changed and the request is
+        // submitted by Bob's correctly configured executor.
+        payment.executor = executorBob;
+        (v, r, ss) = vm.sign(ALICE_KEY, a.paymentDigest(payment));
+        bytes memory wrongVaultSig = abi.encodePacked(r, ss, v);
+        vm.expectRevert(SentinelVault.InvalidSignature.selector);
+        vm.prank(executorBob);
+        b.execute(payment, wrongVaultSig);
+        assertEq(b.balance(), 2e6);
+        assertFalse(b.isNonceUsed(12));
     }
 
     function testNoAllowlistByDefault() public {
