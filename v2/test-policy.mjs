@@ -16,7 +16,8 @@ test('fail closed, expired and nonce replay',()=>{
  const good={paused:false,validated:true,nonceUsed:false,deadline:110n,blockTime:100n,balance:550000n,amount:50000n};
  assert.equal(assess(good).eligible,true);
  assert.equal(assess({...good,nonceUsed:true}).eligible,false);
- assert.equal(assess({...good,deadline:100n}).eligible,false);
+ assert.equal(assess({...good,deadline:100n}).eligible,true); // matches deployed vault at exact deadline
+ assert.equal(assess({...good,deadline:99n}).eligible,false);
  assert.equal(assess({...good,balance:1000n}).eligible,false);
  assert.equal(assess({...good,validated:false}).eligible,false);
 });
