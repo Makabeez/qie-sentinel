@@ -34,3 +34,14 @@ test('deployment preview always has a clickable control and visible feedback',()
  assert.match(app,/\$\('plan-feedback'\)\.textContent='Action needed: '/);
  assert.match(app,/button\.disabled=false/);
 });
+
+test('local vault preview never waits for a wallet RPC and invalidates on chain changes',()=>{
+ const app=read('./app.mjs');
+ const section=app.slice(app.indexOf('async function generatePlan('),app.indexOf("$('generate-plan').addEventListener"));
+ assert.ok(section.includes('plan=deploymentPreview('));
+ assert.ok(!section.includes('provider.request('));
+ assert.ok(!section.includes('await provider.'));
+ const chain=app.slice(app.indexOf("provider?.on?.('chainChanged'"),app.indexOf('function clearReport('));
+ assert.match(chain,/resetPlan\(\)/);
+ assert.match(chain,/\$\('new-owner'\)\.value=''/);
+});
