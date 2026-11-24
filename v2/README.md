@@ -53,12 +53,7 @@ Check the [v2.1 threat model](THREAT_MODEL.md), especially factory/token identit
 
 ```bash
 cd /mnt/c/Github/qie-sentinel-v2
-node --test v2/test-*.mjs
-node --check v2/app.mjs
-export PATH="$HOME/.foundry/bin:$PATH"
-forge fmt --check
-forge build
-forge test --match-contract SentinelVaultFactoryTest -vv
+bash scripts/verify-v2.sh  # Runs Node tests, public-site checks, Foundry build and factory isolation tests
 ```
 
 ## Next development stage (not yet implemented)
