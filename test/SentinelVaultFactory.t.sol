@@ -70,17 +70,17 @@ contract SentinelVaultFactoryTest is Test {
     function testFactoryCannotConfigureOrRecoverUsersFunds() public {
         vm.prank(alice);
         SentinelVault vault = SentinelVault(factory.createVault(executorAlice, 1e6, 5e6));
-        vm.prank(address(factory));
         vm.expectRevert(abi.encodeWithSelector(
             Ownable.OwnableUnauthorizedAccount.selector, address(factory)
         ));
+        vm.prank(address(factory));
         vault.setRecipient(beneficiary, true);
 
         token.mint(address(vault), 300000);
-        vm.prank(address(factory));
         vm.expectRevert(abi.encodeWithSelector(
             Ownable.OwnableUnauthorizedAccount.selector, address(factory)
         ));
+        vm.prank(address(factory));
         vault.pause();
         assertEq(vault.balance(), 300000);
     }
