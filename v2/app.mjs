@@ -32,7 +32,7 @@ provider?.on?.('accountsChanged',()=>{
  setStatus('Wallet context changed','Reconnect to attach your current wallet address to a new review.','warn');
 });
 provider?.on?.('chainChanged',()=>{
- viewer=null;showConnection();clearReport();
+ viewer=null;showConnection();clearReport();$('new-owner').value='';resetPlan();
  setStatus('Wallet network changed','Reconnect after switching to QIE Mainnet.','warn');
 });
 function clearReport(){report=null;$('export').disabled=true;$('copy').disabled=true;$('facts').replaceChildren();}
