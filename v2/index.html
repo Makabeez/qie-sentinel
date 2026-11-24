@@ -49,7 +49,8 @@
     <div><label for="new-max">Maximum per payment (QUSDC)</label><input id="new-max" type="text" value="0.10" required inputmode="decimal"></div>
     <div><label for="new-daily">Daily budget (QUSDC)</label><input id="new-daily" type="text" value="2.00" required inputmode="decimal"></div>
    </div>
-   <button class="button primary" type="submit">Generate deployment preview →</button>
+   <button class="button primary" id="generate-plan" type="button">Generate deployment preview →</button>
+   <p id="plan-feedback" role="status" aria-live="polite" class="plan-feedback">Connect your wallet above and enter a different executor address to prepare a preview.</p>
   </form>
   <div class="plan-preview" aria-live="polite">
    <span class="eyebrow">LOCAL DEPLOYMENT PLAN</span>
