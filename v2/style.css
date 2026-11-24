@@ -19,3 +19,5 @@
 #download-plan{margin-top:21px}
 @media(max-width:900px){.onboarding-grid{grid-template-columns:1fr}}
 @media(max-width:560px){.onboarding-form .cols{grid-template-columns:1fr}.plan-preview{padding:15px}}
+
+.plan-feedback{color:#a8d5d1;font-size:13px;line-height:1.6;margin:12px 0 0;max-width:580px;min-height:1.5em}
