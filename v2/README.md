@@ -6,10 +6,10 @@ This is the **first read-only stage**, not a live approval or multi-tenant treas
 
 ## Windows folder conventions
 
-- Working project: **`C:\\Github\\qie-sentinel`** (WSL: **`/mnt/c/Github/qie-sentinel`**).
-- Any new projects or separate worktrees: **`C:\\Github\\<project-folder>`**.
-- Downloads: **`C:\\Users\\VPS\\Downloads`** (WSL: **`/mnt/c/Users/VPS/Downloads`**).
-- Keep the original submitted repository on `main` and create a separate working tree at **`C:\\Github\\qie-sentinel-v2`**. This avoids changing files used by your running local PM2 dashboard.
+- Working project: **`C:\Github\qie-sentinel`** (WSL: **`/mnt/c/Github/qie-sentinel`**).
+- Any new projects or separate worktrees: **`C:\Github\<project-folder>`**.
+- Downloads: **`C:\Users\VPS\Downloads`** (WSL: **`/mnt/c/Users/VPS/Downloads`**).
+- Keep the original submitted repository on `main` and create a separate working tree at **`C:\Github\qie-sentinel-v2`**. This avoids changing files used by your running local PM2 dashboard.
 
 ## Try it
 ```bash
