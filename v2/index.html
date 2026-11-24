@@ -19,7 +19,7 @@
 <form id="proposal" novalidate>
 <label for="recipient">QUSDC recipient</label><input id="recipient" required spellcheck="false" autocomplete="off" value="0xce99cF8EdfD199dB02b830445d89E746B8c1C7ff"><small>Address must be allowlisted in the demonstration PolicyGuard.</small>
 <div class="cols"><div><label for="amount">Amount (QUSDC)</label><input id="amount" required inputmode="decimal" value="0.05"></div><div><label for="nonce">Proposal nonce</label><input id="nonce" required inputmode="numeric" value="3"></div></div>
-<label for="expiry">Deadline (UTC)</label><input id="expiry" type="datetime-local" required><small>Time is evaluated against the latest QIE block, not your computer clock.</small>
+<label for="expiry">Deadline (your local time)</label><input id="expiry" type="datetime-local" required><small>Entered in your browser’s local timezone, then converted to UTC for comparison with the latest QIE block timestamp. The check does not rely on your computer clock for the blockchain time.</small>
 <label for="purpose">Payment reason</label><textarea id="purpose" maxlength="240" rows="3" placeholder="Example: Invoice for approved AI compute services" required>Demo: approved AI compute service</textarea><small>Reason is a local review note. The existing vault's EIP-712 Payment does not bind this field.</small>
 <button id="evaluate" type="submit" class="button primary">Evaluate proposal →</button>
 </form></section>
