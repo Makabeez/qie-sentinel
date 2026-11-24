@@ -4,9 +4,18 @@
 
 This is the **first read-only stage**, not a live approval or multi-tenant treasury application. Open `v2/index.html` using a local HTTP server to ensure ES modules load. The app requires direct internet connectivity to QIE Mainnet RPC and does not send data to any other server.
 
+## Windows folder conventions
+
+- Working project: **`C:\\Github\\qie-sentinel`** (WSL: **`/mnt/c/Github/qie-sentinel`**).
+- Any new projects or separate worktrees: **`C:\\Github\\<project-folder>`**.
+- Downloads: **`C:\\Users\\VPS\\Downloads`** (WSL: **`/mnt/c/Users/VPS/Downloads`**).
+- This prototype lives in the existing repo's **`v2/`** folder; no new root folder is needed.
+
 ## Try it
 ```bash
 cd /mnt/c/Github/qie-sentinel
+# Windows equivalent: C:\\Github\\qie-sentinel
+# Downloads: C:\\Users\\VPS\\Downloads (WSL: /mnt/c/Users/VPS/Downloads)
 git fetch origin
 git switch feat/v2-owner-approval
 python3 -m http.server 8766 --bind 127.0.0.1
