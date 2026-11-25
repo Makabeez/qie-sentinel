@@ -1,8 +1,8 @@
 # QIE Sentinel v2.5 — Experimental Independent Vault & Cryptographic Security Lab
 
-**Current milestone:** v2.5. The experimental multi-user vault factory is **undeployed**. The browser previews, live digest verification, and offline integrity lab do **not** authorize payments, verify real wallet signatures, or broadcast transactions. Disposable-key EOA and ERC-1271 signature verification runs only in Foundry tests.
+**Current milestone:** v2.6. The experimental multi-user vault factory is **undeployed**. The browser previews, live digest verification, and offline integrity lab do **not** authorize payments, verify real wallet signatures, or broadcast transactions. Disposable-key EOA and ERC-1271 signature verification runs only in Foundry tests.
 
-**Entry points:** `v2/index.html` (read-only policy / unsigned proposal), `v2/verify.html` (independent digest comparison) and `v2/crypto-lab.html` (offline tamper lab). See [Signature Lab](SIGNATURE_LAB_README.md), [Verifier](VERIFY_README.md), and [Threat Model](THREAT_MODEL.md).
+**Entry points:** `v2/index.html` (policy / unsigned proposal), `v2/verify.html` (pinned on-chain digest check), `v2/crypto-lab.html` (offline tamper lab) and `v2/owner-review.html` (digest-bound human risk acknowledgement, **not authorization**). See [Signature Lab](SIGNATURE_LAB_README.md), [Verifier](VERIFY_README.md), and [Threat Model](THREAT_MODEL.md).
 
 **Branch:** `feat/v2-owner-approval` — v1.1 submitted hackathon release remains on `main`.
 
@@ -83,3 +83,10 @@ bash scripts/verify-v2.sh
 
 ## Next development stage (not yet implemented)
 Onboard independently controlled vaults via audited factory, wallet EIP-712 typed-data approval and an authorized executor service with authentication, replay-safe audit storage, explicit user consent and transaction previews. No use of submitted vault's owner keys for third-party accounts.
+
+
+## v2.6 — Human risk review (no signing)
+
+The experimental `owner-review.html` imports both an **unsigned EIP-712 packet** and its **v2.4 verification JSON**, checks digest/domain binding and six explicit user risk acknowledgements, then exports `ACKNOWLEDGED_NOT_AUTHORIZED`. Both files are user-controlled and may be fabricated or stale; no wallet ownership or real authorization is established. It never calls a wallet or broadcasts a transaction.
+
+Do not confuse a generated checklist with an owner signature. Tests: `node --test v2/test-owner-review*.mjs`.
