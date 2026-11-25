@@ -17,6 +17,8 @@ export function altered(packet,field){
  return copy;
 }
 export function integrityComparison(packet,field){
+ if(!['amount','nonce','recipient','deadline','executor','chain','vault'].includes(field))
+  throw new Error('Unsupported mutation');
  const original=offlineEip712(packet);
  let mutatedHash=null,mutationRejected=false,reason='';
  try{mutatedHash=offlineEip712(altered(packet,field)).digest;}
