@@ -1,4 +1,5 @@
 import {deploymentPreview} from './onboarding.mjs';
+import {makeUnsignedEnvelope,matchesProposal,DEMO_OWNER} from './authorization.mjs';
 import {NETWORK,SELECTORS,amountToUnits,unitsToAmount,validAddress,encodedCall,assess,reasonForRevert,proposalEvidence} from './policy.mjs';
 
 const $=id=>document.getElementById(id);
@@ -7,6 +8,37 @@ const TOKEN_BALANCE_OF='0x70a08231';
 let viewer=null;
 let report=null;
 const provider=window.ethereum;
+let authorizationPacket=null;
+function clearAuthorization(){
+ authorizationPacket=null;
+ $('prepare-auth').disabled=true;
+ $('download-auth').disabled=true;
+ $('auth-title').textContent='No authorization preview prepared';
+ $('auth-json').textContent='No data — owner signature not requested.';
+ $('auth-facts').replaceChildren();
+ $('auth-feedback').textContent='Connect the demo-vault owner wallet and successfully evaluate a proposal first.';
+}
+function invalidateAuthorization(reason){
+ authorizationPacket=null;
+ $('download-auth').disabled=true;
+ $('auth-title').textContent='Authorization preview invalidated';
+ $('auth-json').textContent='No current signing packet.';
+ $('auth-facts').replaceChildren();
+ $('auth-feedback').textContent=reason;
+}
+function currentProposal(){
+ const deadlineMs=new Date($('expiry').value).getTime();
+ if(!Number.isFinite(deadlineMs))throw new Error('Enter a valid deadline');
+ return {recipient:$('recipient').value.trim(),amount:$('amount').value.trim(),
+ nonce:$('nonce').value.trim(),deadline:String(Math.floor(deadlineMs/1000))};
+}
+function exportAuthorization(){
+ if(!authorizationPacket)throw new Error('Prepare an unsigned preview first');
+ if(!report||!matchesProposal(authorizationPacket,currentProposal()))
+  throw new Error('Proposal changed; repeat live evaluation before exporting');
+ return authorizationPacket;
+}
+
 
 function showConnection(){
  $('connect').textContent=viewer ? viewer.slice(0,6)+'…'+viewer.slice(-4) : (provider?'Connect wallet':'Wallet optional');
@@ -35,7 +67,7 @@ provider?.on?.('chainChanged',()=>{
  viewer=null;showConnection();clearReport();$('new-owner').value='';resetPlan();
  setStatus('Wallet network changed','Reconnect after switching to QIE Mainnet.','warn');
 });
-function clearReport(){report=null;$('export').disabled=true;$('copy').disabled=true;$('facts').replaceChildren();}
+function clearReport(){clearAuthorization();report=null;$('export').disabled=true;$('copy').disabled=true;$('facts').replaceChildren();}
 function setStatus(title,summary,kind){
  $('status-title').textContent=title;$('status-summary').textContent=summary;
  $('status-icon').textContent=kind==='good'?'✓':kind==='bad'?'×':'!';
@@ -92,6 +124,11 @@ function futureDefault(){
  $('expiry').value=n.toISOString().slice(0,16);
 }
 futureDefault();
+for(const id of ['recipient','amount','nonce','expiry','purpose']){
+ $(id).addEventListener('input',()=>{
+  if(report){clearReport();setStatus('Proposal edited','Re-evaluate against live QIE Mainnet before preparing an unsigned envelope.','warn');}
+ });
+}
 $('proposal').addEventListener('submit',async ev=>{
  ev.preventDefault();const btn=$('evaluate');btn.disabled=true;btn.textContent='Checking QIE Mainnet…';
  clearReport();setStatus('Checking real chain state','No signature or transaction will be requested.','warn');
@@ -142,6 +179,13 @@ $('proposal').addEventListener('submit',async ev=>{
     demoVaultQUSDCBalance:unitsToAmount(balance),paused,nonceUsed,
     validated:guard.pass};
   $('export').disabled=false;$('copy').disabled=false;
+  $('prepare-auth').disabled=!viewer||viewer.toLowerCase()!==DEMO_OWNER.toLowerCase()||!results.eligible;
+  $('auth-feedback').textContent=results.eligible
+    ? (viewer&&viewer.toLowerCase()===DEMO_OWNER.toLowerCase()
+       ? 'Live review passed. Recorded demo-vault owner may inspect unsigned EIP-712 fields.'
+       : 'Read-only review passed, but this owner-only preview requires connecting the recorded demo-vault owner.')
+    : 'Live policy review rejected this proposal. No authorization preview is available.';
+
  }catch(e){
   $('chain-label').textContent='UNAVAILABLE / INVALID INPUT';
   setStatus('No verdict issued',String(e.message||e),'warn');
@@ -226,4 +270,59 @@ $('download-plan').addEventListener('click',()=>{
  const url=URL.createObjectURL(blob),a=document.createElement('a');
  a.href=url;a.download='sentinel-v2-deployment-preview.json';a.click();
  setTimeout(()=>URL.revokeObjectURL(url),1000);
+});
+
+
+$('prepare-auth').addEventListener('click',()=>{
+ try{
+  if(!report||!viewer)throw new Error('Connect the demo owner and run an eligible live review first.');
+  if(!report.viewer||report.viewer.toLowerCase()!==viewer.toLowerCase())
+   throw new Error('Wallet identity changed since the live review. Evaluate again.');
+  if(!report||!matchesCurrentReview())throw new Error('Proposal changed; repeat live evaluation.');
+  const packet=makeUnsignedEnvelope({review:report,viewer,owner:DEMO_OWNER});
+  authorizationPacket=packet;
+  $('auth-title').textContent='UNSIGNED — NOT AUTHORIZED';
+  $('auth-feedback').textContent='Exact EIP-712 typed data prepared. No wallet signature or transaction requested.';
+  $('auth-json').textContent=JSON.stringify(packet.typedData,null,2);
+  $('auth-facts').replaceChildren();
+  const facts=[
+   ['Chain',String(packet.typedData.domain.chainId)],
+   ['Vault',packet.typedData.domain.verifyingContract],
+   ['Recipient',packet.typedData.message.recipient],
+   ['Amount',packet.humanReadable.amountQUSDC+' QUSDC'],
+   ['Nonce',packet.typedData.message.nonce],
+   ['Deadline (UTC)',packet.humanReadable.deadlineUTC],
+   ['Executor',packet.typedData.message.executor],
+   ['Signature','Not requested'],
+   ['Transaction','Not broadcast']
+  ];
+  for(const [label,value] of facts){
+   const line=document.createElement('div');line.className='fact';
+   const left=document.createElement('span');left.textContent=label;
+   const right=document.createElement('strong');right.textContent=value;
+   line.append(left,right);$('auth-facts').append(line);
+  }
+  $('download-auth').disabled=false;
+ }catch(err){
+  invalidateAuthorization('Cannot prepare: '+String(err.message||err));
+  $('auth-title').textContent='Unsigned preview unavailable';
+ }
+});
+function matchesCurrentReview(){
+ if(!report)return false;
+ const p=currentProposal();
+ return p.recipient.toLowerCase()===report.recipient.toLowerCase()&&
+  String(amountToUnits(p.amount))===String(amountToUnits(report.amountQUSDC))&&
+  p.nonce===report.nonce&&p.deadline===report.deadline&&
+  $('purpose').value.trim()===report.purpose;
+}
+$('download-auth').addEventListener('click',()=>{
+ try{
+  const data=exportAuthorization();
+  if(!matchesCurrentReview())throw new Error('Proposal changed; repeat live evaluation.');
+  const blob=new Blob([JSON.stringify(data,null,2)+'\n'],{type:'application/json'});
+  const url=URL.createObjectURL(blob),link=document.createElement('a');
+  link.href=url;link.download='sentinel-v2-unsigned-eip712.json';link.click();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+ }catch(e){invalidateAuthorization('Cannot download: '+String(e.message||e));}
 });
