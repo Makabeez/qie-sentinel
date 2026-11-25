@@ -2,6 +2,12 @@
 import {integrityComparison} from './integrity.mjs';
 const $=id=>document.getElementById(id);
 let lastReport=null;
+function addFact(label,value){
+ const line=document.createElement('div');line.className='fact';
+ const left=document.createElement('span');left.textContent=label;
+ const right=document.createElement('strong');right.textContent=String(value);
+ line.append(left,right);$('lab-facts').append(line);
+}
 $('offline-form').addEventListener('submit',async event=>{
  event.preventDefault();
  lastReport=null;$('download-lab').disabled=true;$('lab-facts').replaceChildren();
