@@ -105,6 +105,8 @@ bash scripts/verify-v2.sh
 python3 scripts/run-v27-lab.py
 ```
 
+Open [the 2.7 local test report viewer](http://127.0.0.1:8766/v2/lifecycle.html) in your existing localhost server and select the generated JSON. The viewer displays eleven test results but cannot authenticate an imported report.
+
 The last command **actually runs** the 11 Foundry lifecycle tests before producing `C:\\Users\\VPS\\Downloads\\sentinel-v27-local-authorization-report.json` (via WSL mount). The JSON contains test names, commit, timestamp, Foundry version and explicit `LOCAL_FOUNDRY_EVM_ONLY` provenance. The report is user-generated and not cryptographically signed.
 
 **Not implemented:** production wallet signing, a mainnet factory, authenticated executor, custody management, real-user deployment or a live payment. Keep PR #1 a draft until independent audit and a separate production architecture review.
