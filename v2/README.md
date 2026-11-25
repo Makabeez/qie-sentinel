@@ -56,5 +56,26 @@ cd /mnt/c/Github/qie-sentinel-v2
 bash scripts/verify-v2.sh  # Runs Node tests, public-site checks, Foundry build and factory isolation tests
 ```
 
+## v2.2 — exact EIP-712 authorization preview (UNSIGNED)
+
+After connecting the **recorded demonstration-vault owner wallet** and completing an eligible live policy review, section 06 can export an **unsigned EIP-712 Payment packet**. This packet uses exactly the deployed `SentinelVault.Payment` field order and `EIP712("QIE Sentinel Vault","1")` domain:
+
+- Domain: QIE Mainnet chain 1990, existing verified demonstration vault `0xb752F05a55059C89a43a289d5d055F303B6DD96E`.
+- Message: `token, recipient, amount (raw six-decimal units), nonce, deadline (Unix seconds), executor`.
+- State: `UNSIGNED_NOT_AUTHORIZED`, `signature: null`, `notBroadcast: true`.
+- Editing any input invalidates the live review; a new evaluation is required.
+- The payment reason/invoice description is **not** part of the signed Solidity Payment and is not cryptographically bound.
+- The owner and executor are the *historically recorded* demo-vault participants; they must be checked again on-chain before any future real transaction.
+- This is **not** a wallet signing tool, transaction simulation, durable approval queue, or actual authorization. No external account can sign for the existing demo vault.
+
+Tests:
+
+```bash
+cd /mnt/c/Github/qie-sentinel-v2
+node --test v2/test-*.mjs
+node --check v2/app.mjs
+bash scripts/verify-v2.sh
+```
+
 ## Next development stage (not yet implemented)
 Onboard independently controlled vaults via audited factory, wallet EIP-712 typed-data approval and an authorized executor service with authentication, replay-safe audit storage, explicit user consent and transaction previews. No use of submitted vault's owner keys for third-party accounts.
