@@ -59,3 +59,12 @@ test('2.2 EIP-712 preview is unsigned and requires a live eligible review',()=>{
  assert.match(auth,/UNSIGNED_NOT_AUTHORIZED/);
  assert.ok(!/eth_sendTransaction|eth_signTypedData|personal_sign|eth_sendRawTransaction/.test(app));
 });
+
+test('plan resets clear stale successful labels and edited fields invalidate generated plans',()=>{
+ const app=read('./app.mjs');
+ const fn=app.slice(app.indexOf('function resetPlan('),app.indexOf('async function generatePlan('));
+ assert.match(fn,/\$\('plan-feedback'\)\.textContent=message/);
+ for(const id of ['new-executor','new-max','new-daily'])
+  assert.ok(fn.includes("'"+id+"'"));
+ assert.match(fn,/Configuration changed\. Generate a new deployment preview\./);
+});
