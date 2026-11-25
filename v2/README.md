@@ -1,6 +1,6 @@
-# QIE Sentinel v2.5 — Experimental Independent Vault & Cryptographic Security Lab
+# QIE Sentinel v2.7 — Experimental Independent Vault & Authorization Lifecycle Lab
 
-**Current milestone:** v2.6. The experimental multi-user vault factory is **undeployed**. The browser previews, live digest verification, and offline integrity lab do **not** authorize payments, verify real wallet signatures, or broadcast transactions. Disposable-key EOA and ERC-1271 signature verification runs only in Foundry tests.
+**Current milestone:** v2.7. The experimental multi-user vault factory is **undeployed**. The browser previews, live digest verification, and offline integrity lab do **not** authorize payments, verify real wallet signatures, or broadcast transactions. Disposable-key EOA and ERC-1271 signature verification runs only in Foundry tests.
 
 **Entry points:** `v2/index.html` (policy / unsigned proposal), `v2/verify.html` (pinned on-chain digest check), `v2/crypto-lab.html` (offline tamper lab) and `v2/owner-review.html` (digest-bound human risk acknowledgement, **not authorization**). See [Signature Lab](SIGNATURE_LAB_README.md), [Verifier](VERIFY_README.md), and [Threat Model](THREAT_MODEL.md).
 
@@ -90,3 +90,21 @@ Onboard independently controlled vaults via audited factory, wallet EIP-712 type
 The experimental `owner-review.html` imports both an **unsigned EIP-712 packet** and its **v2.4 verification JSON**, checks digest/domain binding and six explicit user risk acknowledgements, then exports `ACKNOWLEDGED_NOT_AUTHORIZED`. Both files are user-controlled and may be fabricated or stale; no wallet ownership or real authorization is established. It never calls a wallet or broadcasts a transaction.
 
 Do not confuse a generated checklist with an owner signature. Tests: `node --test v2/test-owner-review*.mjs`.
+
+
+## v2.7 — Disposable-key owner authorization lifecycle
+
+The Foundry test suite `test/SentinelV27Lifecycle.t.sol` creates two **distinct, locally simulated** user-owned vaults through the experimental factory, with separate owners, executors, PolicyGuards and simulated token balances. It demonstrates EIP-712 owner signing and executor-submitted payment **only inside the local test EVM**. Tests reject unauthorized executor, wrong owner, cross-vault signatures, replay/cancelled nonces, expired intent, rotated executor, paused vault, exceeded daily budget and unauthorized policy changes. No real owner key is requested or imported.
+
+Run from WSL in `C:\\Github\\qie-sentinel-v2`:
+
+```bash
+cd /mnt/c/Github/qie-sentinel-v2
+git pull --ff-only origin feat/v2-owner-approval
+bash scripts/verify-v2.sh
+python3 scripts/run-v27-lab.py
+```
+
+The last command **actually runs** the 11 Foundry lifecycle tests before producing `C:\\Users\\VPS\\Downloads\\sentinel-v27-local-authorization-report.json` (via WSL mount). The JSON contains test names, commit, timestamp, Foundry version and explicit `LOCAL_FOUNDRY_EVM_ONLY` provenance. The report is user-generated and not cryptographically signed.
+
+**Not implemented:** production wallet signing, a mainnet factory, authenticated executor, custody management, real-user deployment or a live payment. Keep PR #1 a draft until independent audit and a separate production architecture review.
