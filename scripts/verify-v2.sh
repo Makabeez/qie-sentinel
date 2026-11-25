@@ -1,8 +1,18 @@
 #!/usr/bin/env bash
-# QIE Sentinel v2.1 — local validation only. NEVER deploys, signs or broadcasts.
+# QIE Sentinel v2.6 — local validation only. NEVER deploys, signs or broadcasts.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 export PATH="$HOME/.foundry/bin:$PATH"
+# Resolve Foundry explicitly: some hosts have a different 'forge' executable.
+FOUNDRY_FORGE="$HOME/.foundry/bin/forge"
+if [[ ! -x "$FOUNDRY_FORGE" ]]; then
+  echo "[STOP] Foundry forge not found at $FOUNDRY_FORGE. Install Foundry first." >&2
+  exit 2
+fi
+if ! "$FOUNDRY_FORGE" --version | grep -q '^forge Version:'; then
+  echo "[STOP] Unexpected forge binary: $FOUNDRY_FORGE" >&2
+  exit 2
+fi
 current="$(git branch --show-current)"
 if [[ "$current" != "feat/v2-owner-approval" ]]; then
   echo "[STOP] Run from C:\\Github\\qie-sentinel-v2 on feat/v2-owner-approval, not from the submitted main branch." >&2
@@ -20,7 +30,9 @@ echo "[4/6] No sensitive files tracked"
 bash scripts/check-publish.sh
 echo "[5/6] Install pinned Foundry dependencies and compile (no deployment)"
 bash scripts/install-deps.sh
-forge build
-echo "[6/6] Independent-owner factory isolation tests"
-forge test --match-contract SentinelVaultFactoryTest -vv
-echo "[PASS] v2.1 local checks passed. No mainnet transaction, signature or deployment."
+"$FOUNDRY_FORGE" build
+echo "[6/6] Factory isolation and offline signature lab tests"
+"$FOUNDRY_FORGE" test --match-contract SentinelVaultFactoryTest -vv
+"$FOUNDRY_FORGE" test --match-contract SentinelSignatureLabTest -vv
+"$FOUNDRY_FORGE" test --match-contract SentinelOfflineSignatureTest -vv
+echo "[PASS] v2 local checks passed. No mainnet transaction, signature or deployment."
