@@ -32,3 +32,11 @@
 .authorization .fact{align-items:flex-start}
 .authorization .fact strong{overflow-wrap:anywhere;max-width:70%}
 @media(max-width:560px){.authorization-actions{flex-direction:column}.authorization-actions .button{width:100%}.auth-output{padding:15px}}
+
+
+/* 2.6 — deliberate local risk acknowledgement */
+#review-checks{display:grid;gap:12px;margin:18px 0 24px}
+.risk-check{display:flex;align-items:flex-start;gap:12px;border:1px solid #36546a;border-radius:9px;padding:13px 14px;font-size:13px;line-height:1.5;color:#d1e8f0;cursor:pointer}
+.risk-check input{width:19px;height:19px;min-width:19px;accent-color:#57e6cc;margin:0}
+#review-form input[type=file]{margin:10px 0 16px;width:100%;background:#0b1c2c;color:#d3e8f4;border:1px solid #3c566d;border-radius:9px;padding:13px}
+#review-facts .fact strong{overflow-wrap:anywhere;max-width:68%}
