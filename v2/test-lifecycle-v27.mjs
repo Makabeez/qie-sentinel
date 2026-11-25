@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {classifyLocalReport} from './lifecycle-v27.mjs';
+import {classifyLocalReport} from './lifecycle-validation.mjs';
 const names=[
  'testV27IndependentUsersReceiveDistinctOwnershipAndGuards',
  'testV27IndependentOwnerConsentAndExecutorPerformOnlyScopedTransfer',
