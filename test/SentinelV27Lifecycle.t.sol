@@ -152,8 +152,9 @@ contract SentinelV27LifecycleTest is Test {
 
     function testV27BudgetLimitBlocksAdditionalPaymentWithoutConsumingNonce() public {
         SentinelVault.Payment memory first = _payment(aliceVault, executorAlice, 250_000, 9);
+        bytes memory firstSig = _sign(aliceVault, first, ALICE_KEY);
         vm.prank(executorAlice);
-        aliceVault.execute(first, _sign(aliceVault, first, ALICE_KEY));
+        aliceVault.execute(first, firstSig);
 
         SentinelVault.Payment memory second = _payment(aliceVault, executorAlice, 200_000, 10);
         bytes memory sig = _sign(aliceVault, second, ALICE_KEY);
