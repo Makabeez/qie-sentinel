@@ -207,12 +207,18 @@ $('copy').addEventListener('click',async()=>{
 
 
 let plan=null;
-function resetPlan(){
+function resetPlan(message='Connect your wallet and enter a different executor to generate a new preview.'){
  plan=null;
  $('download-plan').disabled=true;
  $('plan-facts').replaceChildren();
  $('plan-title').textContent='No plan generated';
  $('plan-summary').textContent='A valid plan can be exported, but this prototype cannot deploy a vault.';
+ $('plan-feedback').textContent=message;
+}
+for(const id of ['new-executor','new-max','new-daily']){
+ $(id).addEventListener('input',()=>{
+  if(plan)resetPlan('Configuration changed. Generate a new deployment preview.');
+ });
 }
 async function generatePlan(event){
  event?.preventDefault();
