@@ -45,3 +45,17 @@ test('local vault preview never waits for a wallet RPC and invalidates on chain 
  assert.match(chain,/resetPlan\(\)/);
  assert.match(chain,/\$\('new-owner'\)\.value=''/);
 });
+
+test('2.2 EIP-712 preview is unsigned and requires a live eligible review',()=>{
+ const html=read('./index.html'),app=read('./app.mjs'),auth=read('./authorization.mjs');
+ assert.match(html,/id="prepare-auth"/);
+ assert.match(html,/id="download-auth"/);
+ assert.match(html,/UNSIGNED PREVIEW|UNSIGNED PREVIEW|UNSIGNED|NO SIGNING/);
+ assert.match(app,/makeUnsignedEnvelope\(\{review:report,viewer,owner:DEMO_OWNER\}\)/);
+ assert.match(app,/matchesCurrentReview\(\)/);
+ assert.match(app,/\$\(id\)\.addEventListener\('input'/);
+ assert.match(app,/clearReport\(\)/);
+ assert.match(app,/link\.download='sentinel-v2-unsigned-eip712\.json'/);
+ assert.match(auth,/UNSIGNED_NOT_AUTHORIZED/);
+ assert.ok(!/eth_sendTransaction|eth_signTypedData|personal_sign|eth_sendRawTransaction/.test(app));
+});
