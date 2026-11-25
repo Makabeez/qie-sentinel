@@ -28,8 +28,9 @@ test('tampering with any signed field changes independently computed hash',()=>{
  for(const change of [{amount:'50001'},{recipient:DEMO_OWNER},{nonce:'4'},
    {deadline:'1795878481'},{executor:recipient}]){
   const mutated=packet();Object.assign(mutated.typedData.message,change);
-  if(change.executor)assert.throws(()=>offlineEip712(mutated)); // demo executor pinned
-  else assert.notEqual(offlineEip712(mutated).digest,original);
+  // A different valid executor creates a DIFFERENT digest; current chain
+  // executor() and policy checks separately determine executability.
+  assert.notEqual(offlineEip712(mutated).digest,original);
  }
 });
 test('wrong chain and vault fail closed before digest generation',()=>{
