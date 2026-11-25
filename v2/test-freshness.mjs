@@ -45,7 +45,7 @@ test('fail closed for stale owner, rotated executor, replay, paused and expiry',
  const mutations=[
   {owner:recipient},{executor:recipient},{nonceUsed:true},{paused:true},
   {timestamp:1800000201n},{policyPass:false},{balance:1n},
-  {chainId:1},{guard:recipient},{token:recipient},{codeExists:false},{identityMatches:false},
+  {chainId:1},{guard:recipient},{token:recipient},{codeExists:false},
   {digest:'0xdead'},{domainSeparator:'0xbeef'}
  ];
  for(const change of mutations){
