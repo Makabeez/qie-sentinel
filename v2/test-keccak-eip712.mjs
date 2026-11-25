@@ -39,3 +39,15 @@ test('wrong chain and vault fail closed before digest generation',()=>{
  const other=packet();other.typedData.domain.verifyingContract=recipient;
  assert.throws(()=>offlineEip712(other));
 });
+
+test('tampered EIP-712 domain schema or hidden extra payment fields are rejected',()=>{
+ const wrongDomain=packet();
+ wrongDomain.typedData.types.EIP712Domain[2].type='string';
+ assert.throws(()=>offlineEip712(wrongDomain),/Noncanonical EIP712Domain/);
+ const extraDomain=packet();
+ extraDomain.typedData.domain.salt='0x'+'00'.repeat(32);
+ assert.throws(()=>offlineEip712(extraDomain),/Unexpected domain metadata/);
+ const extraMessage=packet();
+ extraMessage.typedData.message.fakeInvoice='Not signed';
+ assert.throws(()=>offlineEip712(extraMessage),/Unexpected payment fields/);
+});
