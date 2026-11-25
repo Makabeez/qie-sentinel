@@ -137,7 +137,7 @@ contract SentinelSignatureLabTest is Test {
         assertFalse(SignatureChecker.isValidSignatureNow(address(wallet), other.paymentDigest(p), original));
 
         vm.warp(p.deadline + 1);
-        vm.expectRevert(SentinelVault.ExpiredIntent.selector);
+        vm.expectRevert(abi.encodeWithSelector(SentinelVault.ExpiredIntent.selector, p.deadline, p.deadline + 1));
         vm.prank(executor);
         vault.execute(p, original);
         _assertNoPaymentSideEffects(25);
