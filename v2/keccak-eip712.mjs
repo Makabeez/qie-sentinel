@@ -68,6 +68,19 @@ export function offlineEip712(packet){
  // Validate exact expected vault, domain and canonical message first.
  encodeDigestCall(packet);
  const domain=packet.typedData.domain,m=packet.typedData.message;
+ // Reject malformed EIP712Domain metadata in imported, user-controlled JSON.
+ const meta=packet.typedData.types?.EIP712Domain;
+ const domainFields=['name','version','chainId','verifyingContract'];
+ const domainTypes=['string','string','uint256','address'];
+ if(!Array.isArray(meta)||meta.length!==4||
+    meta.some((entry,i)=>entry?.name!==domainFields[i]||entry?.type!==domainTypes[i]))
+   throw new Error('Noncanonical EIP712Domain fields');
+ const domainKeys=Object.keys(domain).sort();
+ if(domainKeys.join(',')!==domainFields.slice().sort().join(','))
+   throw new Error('Unexpected domain metadata');
+ const messageKeys=Object.keys(m).sort();
+ if(messageKeys.join(',')!==['token','recipient','amount','nonce','deadline','executor'].sort().join(','))
+   throw new Error('Unexpected payment fields');
  const dh=keccak256(concat(
   hashUtf8('EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)'),
   hashUtf8(domain.name),hashUtf8(domain.version),
