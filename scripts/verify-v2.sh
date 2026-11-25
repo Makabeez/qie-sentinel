@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# QIE Sentinel v2.6 — local validation only. NEVER deploys, signs or broadcasts.
+# QIE Sentinel v2.7 — local validation only. NEVER deploys, signs or broadcasts.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 export PATH="$HOME/.foundry/bin:$PATH"
@@ -35,4 +35,5 @@ echo "[6/6] Factory isolation and offline signature lab tests"
 "$FOUNDRY_FORGE" test --match-contract SentinelVaultFactoryTest -vv
 "$FOUNDRY_FORGE" test --match-contract SentinelSignatureLabTest -vv
 "$FOUNDRY_FORGE" test --match-contract SentinelOfflineSignatureTest -vv
+"$FOUNDRY_FORGE" test --match-contract SentinelV27LifecycleTest -vv
 echo "[PASS] v2 local checks passed. No mainnet transaction, signature or deployment."
