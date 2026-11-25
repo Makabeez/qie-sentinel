@@ -1,8 +1,12 @@
-# QIE Sentinel v2 — independent reviewer prototype
+# QIE Sentinel v2.5 — Experimental Independent Vault & Cryptographic Security Lab
+
+**Current milestone:** v2.5. The experimental multi-user vault factory is **undeployed**. The browser previews, live digest verification, and offline integrity lab do **not** authorize payments, verify real wallet signatures, or broadcast transactions. Disposable-key EOA and ERC-1271 signature verification runs only in Foundry tests.
+
+**Entry points:** `v2/index.html` (read-only policy / unsigned proposal), `v2/verify.html` (independent digest comparison) and `v2/crypto-lab.html` (offline tamper lab). See [Signature Lab](SIGNATURE_LAB_README.md), [Verifier](VERIFY_README.md), and [Threat Model](THREAT_MODEL.md).
 
 **Branch:** `feat/v2-owner-approval` — v1.1 submitted hackathon release remains on `main`.
 
-This is the **first read-only stage**, not a live approval or multi-tenant treasury application. Open `v2/index.html` using a local HTTP server to ensure ES modules load. The app requires direct internet connectivity to QIE Mainnet RPC and does not send data to any other server.
+This remains an **experimental development branch**, not a live approval or multi-tenant treasury application. Open `v2/index.html` using a local HTTP server to ensure ES modules load. The app requires direct internet connectivity to QIE Mainnet RPC and does not send data to any other server.
 
 ## Windows folder conventions
 
