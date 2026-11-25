@@ -1,4 +1,4 @@
-const EXPECTED=Object.freeze([
+export const EXPECTED=Object.freeze([
  'testV27IndependentUsersReceiveDistinctOwnershipAndGuards',
  'testV27IndependentOwnerConsentAndExecutorPerformOnlyScopedTransfer',
  'testV27AIAgentOrUnauthorizedCallerCannotSubmitSignedPayment',
