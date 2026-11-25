@@ -21,3 +21,14 @@
 @media(max-width:560px){.onboarding-form .cols{grid-template-columns:1fr}.plan-preview{padding:15px}}
 
 .plan-feedback{color:#a8d5d1;font-size:13px;line-height:1.6;margin:12px 0 0;max-width:580px;min-height:1.5em}
+
+
+/* v2.2 exact read-only EIP-712 review */
+.authorization{margin-top:22px}
+.authorization-actions{display:flex;flex-wrap:wrap;gap:12px;padding-top:22px}
+.auth-output{margin-top:22px;border:1px solid #315d57;background:#091b2a;border-radius:12px;padding:22px}
+.auth-output>strong{color:#7af4d5;font-size:15px}
+.auth-json{background:#070f1b;color:#b4e6df;border:1px solid #284b4d;border-radius:9px;margin-top:20px;padding:18px;white-space:pre-wrap;overflow-wrap:anywhere;overflow-x:auto;font:12px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace;max-height:380px;overflow-y:auto}
+.authorization .fact{align-items:flex-start}
+.authorization .fact strong{overflow-wrap:anywhere;max-width:70%}
+@media(max-width:560px){.authorization-actions{flex-direction:column}.authorization-actions .button{width:100%}.auth-output{padding:15px}}
