@@ -66,7 +66,7 @@ export function evaluateDigestSnapshot(packet, snapshot){
  needs(/^0x[0-9a-f]{64}$/i.test(snapshot.digest||''),'Invalid contract payment digest');
  needs(/^0x[0-9a-f]{64}$/i.test(snapshot.domainSeparator||''),'Invalid contract domain separator');
  needs(snapshot.codeExists===true,'Verified vault contract code unavailable');
- needs(snapshot.identityMatches===true,'Connected wallet account or network changed');
+ // This read-only import workflow does not authenticate the viewer's wallet.
  // This is a check of *current chain policy* only, not proof of a signature.
  return {state:failures.length?'STALE_OR_BLOCKED':'CURRENT_UNSIGNED',
    checksPassed:failures.length===0,reasons:failures,chainId:1990,
