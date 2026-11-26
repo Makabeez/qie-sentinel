@@ -172,5 +172,5 @@ The CI Foundry profile uses `fuzz.runs=1024` and `invariant.runs=256`, `depth=64
 cd /mnt/c/Github/qie-sentinel-v2
 git pull --ff-only origin feat/v2-owner-approval
 bash scripts/verify-v2.sh
-$HOME/.foundry/bin/forge test --match-contract SentinelV31InvariantTest --invariant-runs 256 --invariant-depth 64 -vv
+FOUNDRY_PROFILE=ci $HOME/.foundry/bin/forge test --match-contract SentinelV31InvariantTest -vv
 ```
