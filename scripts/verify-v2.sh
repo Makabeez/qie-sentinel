@@ -36,4 +36,5 @@ echo "[6/6] Factory isolation and offline signature lab tests"
 "$FOUNDRY_FORGE" test --match-contract SentinelSignatureLabTest -vv
 "$FOUNDRY_FORGE" test --match-contract SentinelOfflineSignatureTest -vv
 "$FOUNDRY_FORGE" test --match-contract SentinelV27LifecycleTest -vv
+"$FOUNDRY_FORGE" test --match-contract SentinelV28SecurityReviewTest -vv
 echo "[PASS] v2 local checks passed. No mainnet transaction, signature or deployment."
