@@ -1,6 +1,6 @@
-# QIE Sentinel v3.1 — Stateful Security Invariant Lab
+# QIE Sentinel v3.2 — Security Audit Handoff
 
-**Current milestone:** v3.1. The experimental multi-user vault factory is **undeployed**. The browser previews, live digest verification, and offline integrity lab do **not** authorize payments, verify real wallet signatures, or broadcast transactions. Disposable-key EOA and ERC-1271 signature verification runs only in Foundry tests.
+**Current milestone:** v3.2. The experimental multi-user vault factory is **undeployed**. The browser previews, live digest verification, and offline integrity lab do **not** authorize payments, verify real wallet signatures, or broadcast transactions. Disposable-key EOA and ERC-1271 signature verification runs only in Foundry tests.
 
 **Entry points:** `v2/index.html` (policy / unsigned proposal), `v2/verify.html` (pinned on-chain digest check), `v2/crypto-lab.html` (offline tamper lab) and `v2/owner-review.html` (digest-bound human risk acknowledgement, **not authorization**). See [Signature Lab](SIGNATURE_LAB_README.md), [Verifier](VERIFY_README.md), and [Threat Model](THREAT_MODEL.md).
 
@@ -174,3 +174,19 @@ git pull --ff-only origin feat/v2-owner-approval
 bash scripts/verify-v2.sh
 FOUNDRY_PROFILE=ci $HOME/.foundry/bin/forge test --match-contract SentinelV31InvariantTest -vv
 ```
+
+
+## v3.2 — Reproducible security audit handoff (not externally audited)
+
+The [auditor handoff](../audit/V32_AUDITOR_HANDOFF.md) inventories the epoch-protected V29 vault, independent V30 factory, shared PolicyGuard, privileged roles and still-open deployment blockers. It includes a 12-item risk register and commands to reproduce the existing Foundry/Node tests. The assessment does **not** certify real-world safety or authorize live deployments.
+
+The newly added `test/SentinelV32ContractOwner.t.sol` + `test/mocks/MockV32ContractOwner.sol` exercise ERC-1271 contract-wallet ownership on the epoch-protected V29 vault. Tests cover legitimate wallet signatures, wrong signer, revocation, signer rotation, executor epoch changes, nonce cancellation and cross-vault binding. It also deliberately demonstrates **R2**: rotating an ERC-1271 wallet's *internal* signer away and back may revive an unconsumed, unexpired signature without updating the vault owner epoch. Explicit nonce cancellation prevents this specific replay, but an audited design must address this more generally.
+
+```bash
+cd /mnt/c/Github/qie-sentinel-v2
+git pull --ff-only origin feat/v2-owner-approval
+FOUNDRY_PROFILE=ci $HOME/.foundry/bin/forge test --match-contract SentinelV32ContractOwnerTest -vv
+bash scripts/verify-v2.sh
+```
+
+This project remains local-test-only, experimental and **NOT production ready**. No QIE Mainnet contract was changed.
