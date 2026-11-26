@@ -1,4 +1,4 @@
-# QIE Sentinel v2.8 — Threat model and release gates
+# QIE Sentinel v2.9 — Threat model and release gates
 
 **Status:** experimental design branch, not deployed; not audited; no third-party custody.
 
@@ -48,6 +48,19 @@ The following observations relate to the Solidity code as implemented, not evide
 | **Unaudited / nonstandard or upgradeable ERC-20 token behavior** | Dependency / deployment risk | Factory validates the provided token is a contract but not official QUSDC provenance, decimals, transfer fees or unusual callbacks. Token identity and economic assumptions require an external audit/review |
 
 **Do not treat passing test coverage as an audit.** The signed-data schema in the existing, source-verified demonstration vault must not be altered in place. Any mitigation requiring signature-schema changes needs a separate audited version and migration/redeployment strategy.
+
+## v2.9 experimental authorization-epoch mitigation (NOT DEPLOYED)
+
+The isolated `src/SentinelVaultV29.sol` is **a different contract and EIP-712 schema** from deployed `src/SentinelVault.sol`:
+
+- Defines `ownerEpoch` and `executorEpoch` state. Every completed ownership transfer increments `ownerEpoch`; every executor setter call increments `executorEpoch`, including assigning the same executor again.
+- Signs both epoch values inside `Payment(...,uint256 ownerEpoch,uint256 executorEpoch)`, domain `QIE Sentinel Vault V2` version `2`. Those values are compared with current epochs *before* signature verification.
+- New signature format intentionally **cannot** be used with the deployed v1.1 vault. Older v1.1 signature payloads cannot authorize the experimental v2.9 vault.
+- Unlike the 2.8 recorded failure, a payment signed before transfer to another owner cannot revive after ownership returns; likewise for executor restoration. The test suite asserts the reverts and records zero token movement.
+- Changes to epoch counters are intentionally monotonic; operational policy change methods do not alter authorization epochs. Manual nonce cancellation remains available.
+- `test/SentinelV29Epoch.t.sol` validates the mitigation strictly in a local Foundry environment using synthetic assets and test keys.
+
+**Open release blockers:** Independent code review, scrutiny of all owner-transfer and ERC-1271 cases, EIP-712 frontend interoperability, full audit, official token verification, secure onboarding and authenticated executor. Future factory deployment would require a reviewed factory explicitly deploying the new version; the existing `SentinelVaultFactory.sol` still creates the **legacy** vault. Do not merge, migrate or deploy until those design gates are complete.
 
 ## Required gates before real deployment
 
