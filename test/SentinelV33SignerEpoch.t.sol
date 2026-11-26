@@ -48,8 +48,9 @@ contract SentinelV33SignerEpochTest is Test {
 
     function testV33ValidCurrentWalletEpochExecutes() public {
         SentinelVaultV33.Payment memory p=_intent(1);
+        bytes memory sig=_sign(p,KEY_A);
         vm.prank(executor);
-        vault.execute(p,_sign(p,KEY_A));
+        vault.execute(p,sig);
         assertEq(stable.balanceOf(recipient),100_000);
         assertTrue(vault.isNonceUsed(1));
     }
@@ -66,8 +67,9 @@ contract SentinelV33SignerEpochTest is Test {
         vault.execute(p,sig);
         _unchanged(2);
         SentinelVaultV33.Payment memory current=_intent(3);
+        bytes memory freshSig=_sign(current,KEY_A);
         vm.prank(executor);
-        vault.execute(current,_sign(current,KEY_A));
+        vault.execute(current,freshSig);
         assertEq(stable.balanceOf(recipient),100_000);
     }
 
@@ -85,9 +87,10 @@ contract SentinelV33SignerEpochTest is Test {
 
     function testV33WrongSignerRejectedWithoutBurningNonce() public {
         SentinelVaultV33.Payment memory p=_intent(5);
+        bytes memory badSig=_sign(p,KEY_B);
         vm.expectRevert(SentinelVaultV33.InvalidSignature.selector);
         vm.prank(executor);
-        vault.execute(p,_sign(p,KEY_B));
+        vault.execute(p,badSig);
         _unchanged(5);
     }
 
@@ -129,8 +132,9 @@ contract SentinelV33SignerEpochTest is Test {
         wallet.changeSigner(vm.addr(KEY_A));
         vm.expectRevert(abi.encodeWithSelector(SentinelVaultV33.NonceAlreadyUsed.selector,uint256(8)));
         SentinelVaultV33.Payment memory nowCurrent=_intent(8);
+        bytes memory newSig=_sign(nowCurrent,KEY_A);
         vm.prank(executor);
-        vault.execute(nowCurrent,_sign(nowCurrent,KEY_A));
+        vault.execute(nowCurrent,newSig);
         assertTrue(vault.isNonceUsed(8));
         assertEq(stable.balanceOf(recipient),0);
     }
