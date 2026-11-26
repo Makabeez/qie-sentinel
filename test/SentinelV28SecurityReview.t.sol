@@ -150,4 +150,56 @@ contract SentinelV28SecurityReviewTest is Test {
         assertEq(token.balanceOf(recipient), 0);
         assertEq(token.balanceOf(address(vault)), 50_000);
     }
+
+    /// @notice Documented design caveat: returning ownership to a past signer
+    ///         makes their previously valid, unconsumed signed intent valid again.
+    ///         A production v3 should include owner epochs or explicit nonce
+    ///         invalidation on each owner change. DO NOT change submitted v1.1.
+    function testV28PreviouslySignedIntentRevalidatesWhenOwnershipReturns() public {
+        SentinelVault.Payment memory p = _payment(44, 100_000);
+        bytes memory originalSig = _sign(p, OLD_KEY);
+
+        vm.prank(oldOwner);
+        vault.transferOwnership(newOwner);
+        vm.prank(newOwner);
+        vault.acceptOwnership();
+
+        vm.expectRevert(SentinelVault.InvalidSignature.selector);
+        vm.prank(executor);
+        vault.execute(p, originalSig);
+        assertFalse(vault.isNonceUsed(44));
+
+        vm.prank(newOwner);
+        vault.transferOwnership(oldOwner);
+        vm.prank(oldOwner);
+        vault.acceptOwnership();
+
+        // This succeeds under the EXISTING signature schema.
+        // It documents a revivability risk, not a production endorsement.
+        vm.prank(executor);
+        vault.execute(p, originalSig);
+        assertTrue(vault.isNonceUsed(44));
+        assertEq(token.balanceOf(recipient), 100_000);
+    }
+
+    /// @notice Executor rotation only changes present executor authorization.
+    ///         A previously signed intent can execute after rotation back.
+    function testV28PreviouslySignedIntentRevalidatesWhenExecutorReturns() public {
+        SentinelVault.Payment memory p = _payment(45, 100_000);
+        bytes memory originalSig = _sign(p, OLD_KEY);
+
+        vm.prank(oldOwner);
+        vault.setExecutor(outsider);
+        vm.expectRevert(abi.encodeWithSelector(SentinelVault.UnauthorizedExecutor.selector, executor));
+        vm.prank(executor);
+        vault.execute(p, originalSig);
+        assertFalse(vault.isNonceUsed(45));
+
+        vm.prank(oldOwner);
+        vault.setExecutor(executor);
+        vm.prank(executor);
+        vault.execute(p, originalSig);
+        assertTrue(vault.isNonceUsed(45));
+        assertEq(token.balanceOf(recipient), 100_000);
+    }
 }
