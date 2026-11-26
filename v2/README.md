@@ -1,6 +1,6 @@
-# QIE Sentinel v2.8 — Experimental Security Review and Authorization Lifecycle
+# QIE Sentinel v2.9 — Experimental Authorization-Epoch Security Lab
 
-**Current milestone:** v2.8. The experimental multi-user vault factory is **undeployed**. The browser previews, live digest verification, and offline integrity lab do **not** authorize payments, verify real wallet signatures, or broadcast transactions. Disposable-key EOA and ERC-1271 signature verification runs only in Foundry tests.
+**Current milestone:** v2.9. The experimental multi-user vault factory is **undeployed**. The browser previews, live digest verification, and offline integrity lab do **not** authorize payments, verify real wallet signatures, or broadcast transactions. Disposable-key EOA and ERC-1271 signature verification runs only in Foundry tests.
 
 **Entry points:** `v2/index.html` (policy / unsigned proposal), `v2/verify.html` (pinned on-chain digest check), `v2/crypto-lab.html` (offline tamper lab) and `v2/owner-review.html` (digest-bound human risk acknowledgement, **not authorization**). See [Signature Lab](SIGNATURE_LAB_README.md), [Verifier](VERIFY_README.md), and [Threat Model](THREAT_MODEL.md).
 
@@ -126,3 +126,19 @@ git pull --ff-only origin feat/v2-owner-approval
 bash scripts/verify-v2.sh
 $HOME/.foundry/bin/forge test --match-contract SentinelV28SecurityReviewTest -vv
 ```
+
+
+## v2.9 — Authorization epochs for irreversible signer rotation (NOT DEPLOYED)
+
+The additional experimental `src/SentinelVaultV29.sol` introduces an epoch-bound EIP-712 `Payment` structure. A completed ownership transfer increases `ownerEpoch`, and each executor setter call increases `executorEpoch`. Both fields are cryptographically signed and checked during execution. Even if the earlier owner or executor is restored, their signatures from older epochs can no longer authorize payments. `test/SentinelV29Epoch.t.sol` exercises valid signatures, ownership and executor restoration, same-executor resets, tampering with the epochs, nonce revocation, and chain/vault domain separation using **only a local Foundry test EVM**.
+
+This is a **new, incompatible** EIP-712 contract with domain `QIE Sentinel Vault V2`, version `2`; it does not upgrade or alter the deployed, verified v1.1 vault. The existing `SentinelVaultFactory` has deliberately **not** been rewired to deploy V29. There is no production signing or live deployment capability, and no independent audit.
+
+```bash
+cd /mnt/c/Github/qie-sentinel-v2
+git pull --ff-only origin feat/v2-owner-approval
+bash scripts/verify-v2.sh
+$HOME/.foundry/bin/forge test --match-contract SentinelV29EpochTest -vv
+```
+
+See the [v2.9 threat model](THREAT_MODEL.md) for outstanding release blockers.
