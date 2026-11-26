@@ -136,7 +136,11 @@ contract SentinelV32ContractOwnerTest is Test {
         vm.expectRevert(abi.encodeWithSelector(SentinelVaultV29.NonceAlreadyUsed.selector,uint256(25)));
         vm.prank(executor);
         vault.execute(p,sig);
-        _assertUnspent(25);
+        // Cancellation intentionally marks the nonce used even though no tokens move.
+        assertTrue(vault.isNonceUsed(25));
+        assertEq(token.balanceOf(address(vault)),1_000_000);
+        assertEq(token.balanceOf(beneficiary),0);
+        assertEq(vault.guard().spentByDay(block.timestamp / 1 days),0);
     }
 
     function testV32OutsiderCannotInvokeContractWalletAdministration() public {
