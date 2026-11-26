@@ -1,4 +1,4 @@
-# QIE Sentinel v2.1 — Threat model and release gates
+# QIE Sentinel v2.8 — Threat model and release gates
 
 **Status:** experimental design branch, not deployed; not audited; no third-party custody.
 
@@ -31,6 +31,23 @@
 | Review evidence becomes stale | Export block ID/timestamp and display time; live execution must independently revalidate |
 | Sensitive data disclosure | No production proposal storage; never expose existing localhost server or saved keys |
 | Web/RPC outages | Fail closed and show unavailable state, not eligible |
+
+## v2.8 contract review findings (local tests, NOT an independent audit)
+
+The following observations relate to the Solidity code as implemented, not evidence of an exploit on QIE Mainnet. The experimental user factory remains undeployed.
+
+| Finding | Severity for any future multi-user production use | Evidence / mitigation |
+|---|---|---|
+| **Dormant signature revival on ownership restoration** | **High / must resolve before production** | `Payment` binds vault and chain but no ownership epoch. An unconsumed signature from owner A is invalid while B owns the vault and can become valid again if ownership returns to A. See `testV28PreviouslySignedIntentRevalidatesWhenOwnershipReturns`. A future revised vault should consider a monotonic ownership authorization epoch in signed data, as well as nonce invalidation during transitions |
+| **Dormant signature revival on executor restoration** | **High / must resolve before production** | If the executor changes from X to Y and later X again, an unconsumed signature naming X can work again before expiry. See `testV28PreviouslySignedIntentRevalidatesWhenExecutorReturns`. Use a monotonic executor epoch or explicit cancellation policy in a future redesigned signed schema |
+| **Privileged recovery bypasses the policy allowlist and budgets** | Expected design / material custody disclosure | Owner can pause and recover tokens to any nonzero address without guard approval. This is a deliberate escape hatch; disclose as owner privilege, require audited controls for multi-user custody |
+| **Owner transfer requires two steps** | Tested safeguard | `Ownable2Step` requires acceptance by the new owner and immediately invalidates old-owner signatures while a different owner remains active |
+| **Policy changes can invalidate already-signed payments** | Tested safeguard | Removing a recipient or lowering limits causes `execute` to revert without nonce or budget consumption |
+| **Token transfer failure rolls back nonce and budget** | Tested safeguard | Atomic transaction revert prevents partial accounting if the token transfer fails |
+| **Factory registry represents creators, not necessarily current owners** | Operational / UX risk | `getDeployedVaults(creator)` remains historical after ownership transfer. Never present it as an authenticated current-owner portfolio |
+| **Unaudited / nonstandard or upgradeable ERC-20 token behavior** | Dependency / deployment risk | Factory validates the provided token is a contract but not official QUSDC provenance, decimals, transfer fees or unusual callbacks. Token identity and economic assumptions require an external audit/review |
+
+**Do not treat passing test coverage as an audit.** The signed-data schema in the existing, source-verified demonstration vault must not be altered in place. Any mitigation requiring signature-schema changes needs a separate audited version and migration/redeployment strategy.
 
 ## Required gates before real deployment
 
