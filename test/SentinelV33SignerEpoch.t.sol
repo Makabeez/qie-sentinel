@@ -130,9 +130,9 @@ contract SentinelV33SignerEpochTest is Test {
         wallet.invalidateNonces(vault,0,uint256(1)<<8);
         wallet.changeSigner(vm.addr(KEY_B));
         wallet.changeSigner(vm.addr(KEY_A));
-        vm.expectRevert(abi.encodeWithSelector(SentinelVaultV33.NonceAlreadyUsed.selector,uint256(8)));
         SentinelVaultV33.Payment memory nowCurrent=_intent(8);
         bytes memory newSig=_sign(nowCurrent,KEY_A);
+        vm.expectRevert(abi.encodeWithSelector(SentinelVaultV33.NonceAlreadyUsed.selector,uint256(8)));
         vm.prank(executor);
         vault.execute(nowCurrent,newSig);
         assertTrue(vault.isNonceUsed(8));
