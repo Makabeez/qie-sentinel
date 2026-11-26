@@ -1,6 +1,6 @@
-# QIE Sentinel v3.2 — Security Audit Handoff
+# QIE Sentinel v3.3 — Contract-Wallet Signer-Epoch Lab
 
-**Current milestone:** v3.2. The experimental multi-user vault factory is **undeployed**. The browser previews, live digest verification, and offline integrity lab do **not** authorize payments, verify real wallet signatures, or broadcast transactions. Disposable-key EOA and ERC-1271 signature verification runs only in Foundry tests.
+**Current milestone:** v3.3. The experimental multi-user vault factory is **undeployed**. The browser previews, live digest verification, and offline integrity lab do **not** authorize payments, verify real wallet signatures, or broadcast transactions. Disposable-key EOA and ERC-1271 signature verification runs only in Foundry tests.
 
 **Entry points:** `v2/index.html` (policy / unsigned proposal), `v2/verify.html` (pinned on-chain digest check), `v2/crypto-lab.html` (offline tamper lab) and `v2/owner-review.html` (digest-bound human risk acknowledgement, **not authorization**). See [Signature Lab](SIGNATURE_LAB_README.md), [Verifier](VERIFY_README.md), and [Threat Model](THREAT_MODEL.md).
 
@@ -190,3 +190,20 @@ bash scripts/verify-v2.sh
 ```
 
 This project remains local-test-only, experimental and **NOT production ready**. No QIE Mainnet contract was changed.
+
+
+## v3.3 — Compatible contract-wallet signer epoch binding (NOT DEPLOYED)
+
+The independent `src/SentinelVaultV33.sol` prototype adds a signed `signerEpoch` field for contract-wallet owners. The required optional wallet interface is `src/interfaces/ISentinelOwnerSignerEpoch.sol`. A compatible wallet must expose a truthful monotonic `signerEpoch()` that advances on **every authorization-relevant wallet change**. Unrecognized ERC-1271 wallets fail closed. EOAs use signer epoch zero. The EIP-712 domain is deliberately changed to `QIE Sentinel Vault V3`, version `3`; signatures from earlier versions are incompatible.
+
+`test/SentinelV33SignerEpoch.t.sol` and `test/mocks/MockV33EpochWallet.sol` demonstrate prevention of old signatures reviving after internal signer restoration, re-signing at the new epoch, tamper rejection, nonce cancellation, explicit owner/executor epochs and unsupported-wallet rejection. This is a **conditional mitigation**: a dishonest or buggy ERC-1271 wallet can expose false/nonmonotonic epochs. It does not prove support for arbitrary smart accounts.
+
+The v3.0 factory still deploys the **V29** vault, not V33. There is no V33 factory, production onboarding, live signing or deployment. See [v3.3 design and remaining blockers](../audit/V33_SIGNER_EPOCH_DESIGN.md).
+
+```bash
+cd /mnt/c/Github/qie-sentinel-v2
+git pull --ff-only origin feat/v2-owner-approval
+FOUNDRY_PROFILE=ci $HOME/.foundry/bin/forge test --match-contract SentinelV33SignerEpochTest -vv
+bash scripts/verify-v2.sh
+gh pr checks 1
+```
