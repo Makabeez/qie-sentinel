@@ -1,6 +1,6 @@
-# QIE Sentinel v3.3 — Contract-Wallet Signer-Epoch Lab
+# QIE Sentinel v3.4 — Adversarial Wallet Compatibility
 
-**Current milestone:** v3.3. The experimental multi-user vault factory is **undeployed**. The browser previews, live digest verification, and offline integrity lab do **not** authorize payments, verify real wallet signatures, or broadcast transactions. Disposable-key EOA and ERC-1271 signature verification runs only in Foundry tests.
+**Current milestone:** v3.4. The experimental multi-user vault factory is **undeployed**. The browser previews, live digest verification, and offline integrity lab do **not** authorize payments, verify real wallet signatures, or broadcast transactions. Disposable-key EOA and ERC-1271 signature verification runs only in Foundry tests.
 
 **Entry points:** `v2/index.html` (policy / unsigned proposal), `v2/verify.html` (pinned on-chain digest check), `v2/crypto-lab.html` (offline tamper lab) and `v2/owner-review.html` (digest-bound human risk acknowledgement, **not authorization**). See [Signature Lab](SIGNATURE_LAB_README.md), [Verifier](VERIFY_README.md), and [Threat Model](THREAT_MODEL.md).
 
@@ -207,3 +207,20 @@ FOUNDRY_PROFILE=ci $HOME/.foundry/bin/forge test --match-contract SentinelV33Sig
 bash scripts/verify-v2.sh
 gh pr checks 1
 ```
+
+
+## v3.4 — Adversarial ERC-1271 compatibility review (NOT DEPLOYED)
+
+`test/mocks/MockV34AdversarialWallet.sol` simulates malicious or unavailable contract-wallet behavior. `test/SentinelV34WalletCompatibility.t.sol` demonstrates the **still-open** signer-epoch trust problem by freezing the reported epoch across a signing-key rotation and then accepting a revived historical signature. Other local tests assert rejection without state changes when epoch reads fail, ERC-1271 validation reverts, or the wallet returns an invalid signature; they also check explicit nonce cancellation, owner-only emergency recovery and controller restrictions.
+
+The experimental V33 vault has **not** been changed or declared universally safe. A plain ERC-1271 contract reporting `signerEpoch()` is not enough to guarantee safe authorization. A versioned and independently reviewed wallet allowlist and implementation-specific security assessment are necessary before any live wallet integration. See [v3.4 compatibility and release criteria](../audit/V34_WALLET_COMPATIBILITY.md).
+
+```bash
+cd /mnt/c/Github/qie-sentinel-v2
+git pull --ff-only origin feat/v2-owner-approval
+FOUNDRY_PROFILE=ci $HOME/.foundry/bin/forge test --match-contract SentinelV34WalletCompatibilityTest -vv
+bash scripts/verify-v2.sh
+gh pr checks 1
+```
+
+**No production assets, external signing, or QIE Mainnet deployments. Do not merge this draft PR.**
