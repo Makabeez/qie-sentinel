@@ -1,6 +1,6 @@
-# QIE Sentinel v3.0 — Experimental Multi-User Epoch Vault Factory
+# QIE Sentinel v3.1 — Stateful Security Invariant Lab
 
-**Current milestone:** v3.0. The experimental multi-user vault factory is **undeployed**. The browser previews, live digest verification, and offline integrity lab do **not** authorize payments, verify real wallet signatures, or broadcast transactions. Disposable-key EOA and ERC-1271 signature verification runs only in Foundry tests.
+**Current milestone:** v3.1. The experimental multi-user vault factory is **undeployed**. The browser previews, live digest verification, and offline integrity lab do **not** authorize payments, verify real wallet signatures, or broadcast transactions. Disposable-key EOA and ERC-1271 signature verification runs only in Foundry tests.
 
 **Entry points:** `v2/index.html` (policy / unsigned proposal), `v2/verify.html` (pinned on-chain digest check), `v2/crypto-lab.html` (offline tamper lab) and `v2/owner-review.html` (digest-bound human risk acknowledgement, **not authorization**). See [Signature Lab](SIGNATURE_LAB_README.md), [Verifier](VERIFY_README.md), and [Threat Model](THREAT_MODEL.md).
 
@@ -158,3 +158,19 @@ $HOME/.foundry/bin/forge test --match-contract SentinelV30FactoryTest -vv
 ```
 
 **Security boundary:** This factory and the 2.9 vault are unaudited and undeployed. Passing isolation tests does not establish safety of real assets or ownership onboarding. Do not merge into `main`, change the production website, sign transactions or deploy onto QIE Mainnet without independent audit and explicit new deployment plan.
+
+
+## v3.1 — Stateful, randomized two-vault security invariants
+
+The new Foundry `test/invariant/SentinelV31Invariant.t.sol` runs randomized **sequences** against both independent vaults using `test/invariant/SentinelV31Handler.sol`. The handler mixes legitimate owner-signed payments, executor rotations, two-step ownership transfers away and back, independent nonce cancellation, cross-owner signature attempts and unauthorized executor attempts. Whenever an attempt should be rejected, the handler asserts **no nonce or balance change**; state invariants compare both real balances against the accumulated successful-payment ledger.
+
+The invariants continuously check **tenant isolation**, empty cross-tenant allowlists, each vault's daily budget, nonce/use accounting, conservation of mock QUSDC, independent owner/executor epochs and permanent invalidation of old owner signatures after a round-trip transfer.
+
+The CI Foundry profile uses `fuzz.runs=1024` and `invariant.runs=256`, `depth=64`. These are finite simulations, **not formal proof and not an external audit**. All owners/keys and token balances are synthetic. The existing QIE Mainnet vault and production website are unchanged.
+
+```bash
+cd /mnt/c/Github/qie-sentinel-v2
+git pull --ff-only origin feat/v2-owner-approval
+bash scripts/verify-v2.sh
+$HOME/.foundry/bin/forge test --match-contract SentinelV31InvariantTest --invariant-runs 256 --invariant-depth 64 -vv
+```
