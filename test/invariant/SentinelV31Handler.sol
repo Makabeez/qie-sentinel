@@ -105,6 +105,58 @@ contract SentinelV31Handler is Test {
         lastExecutorEpochB = b.executorEpoch();
     }
 
+    // Each round trip to a temporary owner must advance the owner epoch twice.
+    // The old owner's unspent signature stays invalid after restoration.
+    function transferOwnerA(uint8 seed) external {
+        address temporary = seed % 2 == 0 ? ATTACKER : bob;
+        uint256 beforeEpoch = a.ownerEpoch();
+        uint256 nonce = 1024 + uint256(seed);
+        SentinelVaultV29.Payment memory p = _payment(a,RECIP_A,nonce,1);
+        bytes memory stale = _sign(a,p,ALICE_KEY);
+        vm.prank(alice);
+        a.transferOwnership(temporary);
+        vm.prank(temporary);
+        a.acceptOwnership();
+        vm.prank(temporary);
+        a.transferOwnership(alice);
+        vm.prank(alice);
+        a.acceptOwnership();
+        assertEq(a.ownerEpoch(),beforeEpoch+2);
+        uint256 beforeBalance=token.balanceOf(address(a));
+        vm.prank(a.executor());
+        (bool ok,)=address(a).call(abi.encodeCall(SentinelVaultV29.execute,(p,stale)));
+        assertFalse(ok);
+        assertEq(token.balanceOf(address(a)),beforeBalance);
+        assertFalse(a.isNonceUsed(nonce));
+        lastOwnerEpochA=a.ownerEpoch();
+        rejects++;
+    }
+
+    function transferOwnerB(uint8 seed) external {
+        address temporary = seed % 2 == 0 ? ATTACKER : alice;
+        uint256 beforeEpoch = b.ownerEpoch();
+        uint256 nonce = 1024 + uint256(seed);
+        SentinelVaultV29.Payment memory p = _payment(b,RECIP_B,nonce,1);
+        bytes memory stale = _sign(b,p,BOB_KEY);
+        vm.prank(bob);
+        b.transferOwnership(temporary);
+        vm.prank(temporary);
+        b.acceptOwnership();
+        vm.prank(temporary);
+        b.transferOwnership(bob);
+        vm.prank(bob);
+        b.acceptOwnership();
+        assertEq(b.ownerEpoch(),beforeEpoch+2);
+        uint256 beforeBalance=token.balanceOf(address(b));
+        vm.prank(b.executor());
+        (bool ok,)=address(b).call(abi.encodeCall(SentinelVaultV29.execute,(p,stale)));
+        assertFalse(ok);
+        assertEq(token.balanceOf(address(b)),beforeBalance);
+        assertFalse(b.isNonceUsed(nonce));
+        lastOwnerEpochB=b.ownerEpoch();
+        rejects++;
+    }
+
     // Reserve high nonces for cancellation, separate from sequential payment nonces.
     function cancelA(uint8 seed) external {
         uint256 nonce = 128 + uint256(seed) % 128;
