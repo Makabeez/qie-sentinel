@@ -115,6 +115,40 @@ contract SentinelV32ContractOwnerTest is Test {
         assertEq(token.balanceOf(beneficiary),100_000);
     }
 
+    /// @notice A contract wallet may rotate its internal signer away and back
+    ///         WITHOUT changing the vault's ownerEpoch. Old unspent signatures
+    ///         can reactivate, so contract-wallet revocation is a release blocker.
+    function testV32ContractWalletSignerRestorationReactivatesUncancelledIntent() public {
+        SentinelVaultV29.Payment memory p = _payment(27);
+        bytes memory sig = _sign(p,FIRST_KEY);
+        wallet.changeSigner(secondSigner);
+        vm.expectRevert(SentinelVaultV29.InvalidSignature.selector);
+        vm.prank(executor);
+        vault.execute(p,sig);
+        _assertUnspent(27);
+
+        wallet.changeSigner(signer);
+        // This is intentionally positive: it documents a pre-audit R2 risk.
+        vm.prank(executor);
+        vault.execute(p,sig);
+        assertTrue(vault.isNonceUsed(27));
+        assertEq(token.balanceOf(beneficiary),100_000);
+    }
+
+    function testV32ExplicitNonceCancellationStillBlocksRestoredContractSigner() public {
+        SentinelVaultV29.Payment memory p = _payment(28);
+        bytes memory sig = _sign(p,FIRST_KEY);
+        wallet.changeSigner(secondSigner);
+        wallet.changeSigner(signer);
+        wallet.invalidateNonces(vault,0,uint256(1)<<28);
+        vm.expectRevert(abi.encodeWithSelector(SentinelVaultV29.NonceAlreadyUsed.selector,uint256(28)));
+        vm.prank(executor);
+        vault.execute(p,sig);
+        assertTrue(vault.isNonceUsed(28));
+        assertEq(token.balanceOf(beneficiary),0);
+        assertEq(vault.guard().spentByDay(block.timestamp / 1 days),0);
+    }
+
     function testV32ContractWalletExecutorRotationInvalidatesPriorEpoch() public {
         SentinelVaultV29.Payment memory p = _payment(24);
         bytes memory sig = _sign(p,FIRST_KEY);
