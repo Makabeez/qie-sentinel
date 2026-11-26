@@ -1,6 +1,6 @@
-# QIE Sentinel v2.9 — Experimental Authorization-Epoch Security Lab
+# QIE Sentinel v3.0 — Experimental Multi-User Epoch Vault Factory
 
-**Current milestone:** v2.9. The experimental multi-user vault factory is **undeployed**. The browser previews, live digest verification, and offline integrity lab do **not** authorize payments, verify real wallet signatures, or broadcast transactions. Disposable-key EOA and ERC-1271 signature verification runs only in Foundry tests.
+**Current milestone:** v3.0. The experimental multi-user vault factory is **undeployed**. The browser previews, live digest verification, and offline integrity lab do **not** authorize payments, verify real wallet signatures, or broadcast transactions. Disposable-key EOA and ERC-1271 signature verification runs only in Foundry tests.
 
 **Entry points:** `v2/index.html` (policy / unsigned proposal), `v2/verify.html` (pinned on-chain digest check), `v2/crypto-lab.html` (offline tamper lab) and `v2/owner-review.html` (digest-bound human risk acknowledgement, **not authorization**). See [Signature Lab](SIGNATURE_LAB_README.md), [Verifier](VERIFY_README.md), and [Threat Model](THREAT_MODEL.md).
 
@@ -142,3 +142,19 @@ $HOME/.foundry/bin/forge test --match-contract SentinelV29EpochTest -vv
 ```
 
 See the [v2.9 threat model](THREAT_MODEL.md) for outstanding release blockers.
+
+
+## v3.0 — Independently owned epoch-protected vault factory (NOT DEPLOYED)
+
+`src/SentinelEpochFactoryV30.sol` is a **separate experimental** factory which creates `SentinelVaultV29` vaults. It does not modify `SentinelVaultFactory.sol`, the submitted QIE Mainnet vault or existing PolicyGuard. Each local caller becomes the new vault owner, must specify a distinct executor, and receives an independent PolicyGuard with an empty initial recipient allowlist. The factory does not hold or transfer tokens, fund wallets, sign EIP-712 messages or own the resulting vaults.
+
+`test/SentinelV30Factory.t.sol` checks two-user isolation, owner/executor roles, signature scope and replay prevention, restored owner/executor epoch invalidation, factory privilege restrictions, invalid inputs and creation history after ownership transfer. All assets are mock QUSDC; any `execute` calls occur only in Foundry's ephemeral EVM.
+
+```bash
+cd /mnt/c/Github/qie-sentinel-v2
+git pull --ff-only origin feat/v2-owner-approval
+bash scripts/verify-v2.sh
+$HOME/.foundry/bin/forge test --match-contract SentinelV30FactoryTest -vv
+```
+
+**Security boundary:** This factory and the 2.9 vault are unaudited and undeployed. Passing isolation tests does not establish safety of real assets or ownership onboarding. Do not merge into `main`, change the production website, sign transactions or deploy onto QIE Mainnet without independent audit and explicit new deployment plan.
