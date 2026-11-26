@@ -37,7 +37,7 @@ contract SentinelV31InvariantTest is StdInvariant, Test {
         token.mint(address(b),1_000_000);
         handler = new SentinelV31Handler(a,b,token);
 
-        bytes4[] memory selectors = new bytes4[](8);
+        bytes4[] memory selectors = new bytes4[](10);
         selectors[0] = handler.payA.selector;
         selectors[1] = handler.payB.selector;
         selectors[2] = handler.rotateA.selector;
@@ -46,6 +46,8 @@ contract SentinelV31InvariantTest is StdInvariant, Test {
         selectors[5] = handler.cancelB.selector;
         selectors[6] = handler.rejectCrossOwnerA.selector;
         selectors[7] = handler.rejectUnauthorizedB.selector;
+        selectors[8] = handler.transferOwnerA.selector;
+        selectors[9] = handler.transferOwnerB.selector;
         targetSelector(FuzzSelector({addr:address(handler),selectors:selectors}));
         targetContract(address(handler));
     }
