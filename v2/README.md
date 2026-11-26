@@ -1,6 +1,6 @@
-# QIE Sentinel v2.7 — Experimental Independent Vault & Authorization Lifecycle Lab
+# QIE Sentinel v2.8 — Experimental Security Review and Authorization Lifecycle
 
-**Current milestone:** v2.7. The experimental multi-user vault factory is **undeployed**. The browser previews, live digest verification, and offline integrity lab do **not** authorize payments, verify real wallet signatures, or broadcast transactions. Disposable-key EOA and ERC-1271 signature verification runs only in Foundry tests.
+**Current milestone:** v2.8. The experimental multi-user vault factory is **undeployed**. The browser previews, live digest verification, and offline integrity lab do **not** authorize payments, verify real wallet signatures, or broadcast transactions. Disposable-key EOA and ERC-1271 signature verification runs only in Foundry tests.
 
 **Entry points:** `v2/index.html` (policy / unsigned proposal), `v2/verify.html` (pinned on-chain digest check), `v2/crypto-lab.html` (offline tamper lab) and `v2/owner-review.html` (digest-bound human risk acknowledgement, **not authorization**). See [Signature Lab](SIGNATURE_LAB_README.md), [Verifier](VERIFY_README.md), and [Threat Model](THREAT_MODEL.md).
 
@@ -110,3 +110,19 @@ Open [the 2.7 local test report viewer](http://127.0.0.1:8766/v2/lifecycle.html)
 The last command **actually runs** the 11 Foundry lifecycle tests before producing `C:\\Users\\VPS\\Downloads\\sentinel-v27-local-authorization-report.json` (via WSL mount). The JSON contains test names, commit, timestamp, Foundry version and explicit `LOCAL_FOUNDRY_EVM_ONLY` provenance. The report is user-generated and not cryptographically signed.
 
 **Not implemented:** production wallet signing, a mainnet factory, authenticated executor, custody management, real-user deployment or a live payment. Keep PR #1 a draft until independent audit and a separate production architecture review.
+
+
+## v2.8 — Security review and authorization-epoch finding
+
+`test/SentinelV28SecurityReview.t.sol` exercises existing deployed-vault logic **only in the local Foundry EVM**: two-step ownership transfer, invalidation of old-owner signatures while a new owner remains active, policy revocation, lower spending limits, privileged paused recovery and full nonce/budget rollback on token transfer failure. It also demonstrates a **release-blocking design risk**: an unconsumed, unexpired signature may become executable again if the signer becomes owner once more, or if a previously authorized executor is reinstated. The current EIP-712 `Payment` payload has no authorization epoch. See [v2.8 threat findings](THREAT_MODEL.md) for proposed redesign requirements.
+
+This is **not** an externally audited security assessment. The already deployed, verified v1.1 vault is unmodified; no on-chain issue is claimed to have occurred. **Do not** deploy the experimental factory or onboard real funds using this signed-data design before independent review and mitigation.
+
+To run:
+
+```bash
+cd /mnt/c/Github/qie-sentinel-v2
+git pull --ff-only origin feat/v2-owner-approval
+bash scripts/verify-v2.sh
+$HOME/.foundry/bin/forge test --match-contract SentinelV28SecurityReviewTest -vv
+```
