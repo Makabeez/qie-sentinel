@@ -1,6 +1,6 @@
-# QIE Sentinel v3.4 — Adversarial Wallet Compatibility
+# QIE Sentinel v3.5 — Recovery and Token-Transfer Hardening
 
-**Current milestone:** v3.4. The experimental multi-user vault factory is **undeployed**. The browser previews, live digest verification, and offline integrity lab do **not** authorize payments, verify real wallet signatures, or broadcast transactions. Disposable-key EOA and ERC-1271 signature verification runs only in Foundry tests.
+**Current milestone:** v3.5. The experimental multi-user vault factory is **undeployed**. The browser previews, live digest verification, and offline integrity lab do **not** authorize payments, verify real wallet signatures, or broadcast transactions. Disposable-key EOA and ERC-1271 signature verification runs only in Foundry tests.
 
 **Entry points:** `v2/index.html` (policy / unsigned proposal), `v2/verify.html` (pinned on-chain digest check), `v2/crypto-lab.html` (offline tamper lab) and `v2/owner-review.html` (digest-bound human risk acknowledgement, **not authorization**). See [Signature Lab](SIGNATURE_LAB_README.md), [Verifier](VERIFY_README.md), and [Threat Model](THREAT_MODEL.md).
 
@@ -224,3 +224,22 @@ gh pr checks 1
 ```
 
 **No production assets, external signing, or QIE Mainnet deployments. Do not merge this draft PR.**
+
+
+## v3.5 — Isolated security hardening prototype (NOT DEPLOYED)
+
+`src/SentinelVaultV35.sol` is a new, independently versioned vault with EIP-712 domain `QIE Sentinel Vault V4` / version `4`. It **does not modify or replace** the deployed v1.1 vault, V29, V33, or existing factory. It blocks owner/executor overlap at creation and later changes: an owner transfer can nominate the executor but **acceptance** is rejected unless the conflict is resolved. It checks that normal ERC-20 payments debit the vault and credit the recipient by exactly the signed amount, reverting all nonce and budget changes if the token charges a transfer fee; self-recipient payments are rejected.
+
+`test/SentinelV35Hardening.t.sol` tests role conflicts, full delivery, fee-token rollback and emergency recovery with synthetic test assets; `test/mocks/MockV35FeeToken.sol` burns 10% of transferred value solely to test atomic rollback. Exact delta checks **do not make adversarial tokens safe**, and the signer epoch correctness risk from v3.4 remains unresolved. The current factory still creates V29, not V35.
+
+See [the v3.5 hardening review and limitations](../audit/V35_HARDENING_REVIEW.md).
+
+```bash
+cd /mnt/c/Github/qie-sentinel-v2
+git pull --ff-only origin feat/v2-owner-approval
+FOUNDRY_PROFILE=ci $HOME/.foundry/bin/forge test --match-contract SentinelV35HardeningTest -vv
+bash scripts/verify-v2.sh
+gh pr checks 1
+```
+
+This is not an independent audit or a release approval. **No QIE Mainnet contracts, wallet signing, or real funds were involved.**
