@@ -21,3 +21,6 @@ jobs:
         run: forge build --sizes
       - name: Unit, fuzz and invariants
         run: FOUNDRY_PROFILE=ci forge test -vvv
+      - name: Audit candidate scope and reproducibility (experimental branch only)
+        if: github.head_ref == 'feat/v2-owner-approval' || github.ref_name == 'feat/v2-owner-approval'
+        run: FOUNDRY_FORGE="$(command -v forge)" bash scripts/check-rc-v36.sh
