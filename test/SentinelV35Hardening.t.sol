@@ -71,10 +71,10 @@ contract SentinelV35HardeningTest is Test {
 
     function testV35OwnershipCannotTransferToCurrentExecutor() public {
         uint256 epoch=vault.ownerEpoch();
-        vm.expectRevert(abi.encodeWithSelector(SentinelVaultV35.OwnerExecutorConflict.selector,executor));
         vm.prank(owner);
         vault.transferOwnership(executor);
-        // Nomination may be pending, but acceptance must be blocked.
+        assertEq(vault.pendingOwner(),executor);
+        // Ownable2Step permits nomination; acceptance must remain blocked.
         vm.expectRevert(abi.encodeWithSelector(SentinelVaultV35.OwnerExecutorConflict.selector,executor));
         vm.prank(executor);
         vault.acceptOwnership();
