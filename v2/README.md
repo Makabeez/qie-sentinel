@@ -1,6 +1,6 @@
-# QIE Sentinel v3.5 — Recovery and Token-Transfer Hardening
+# QIE Sentinel v3.6 — Frozen Audit Candidate
 
-**Current milestone:** v3.5. The experimental multi-user vault factory is **undeployed**. The browser previews, live digest verification, and offline integrity lab do **not** authorize payments, verify real wallet signatures, or broadcast transactions. Disposable-key EOA and ERC-1271 signature verification runs only in Foundry tests.
+**Current milestone:** v3.6. The experimental multi-user vault factory is **undeployed**. The browser previews, live digest verification, and offline integrity lab do **not** authorize payments, verify real wallet signatures, or broadcast transactions. Disposable-key EOA and ERC-1271 signature verification runs only in Foundry tests.
 
 **Entry points:** `v2/index.html` (policy / unsigned proposal), `v2/verify.html` (pinned on-chain digest check), `v2/crypto-lab.html` (offline tamper lab) and `v2/owner-review.html` (digest-bound human risk acknowledgement, **not authorization**). See [Signature Lab](SIGNATURE_LAB_README.md), [Verifier](VERIFY_README.md), and [Threat Model](THREAT_MODEL.md).
 
@@ -243,3 +243,19 @@ gh pr checks 1
 ```
 
 This is not an independent audit or a release approval. **No QIE Mainnet contracts, wallet signing, or real funds were involved.**
+
+
+## v3.6 — Project consolidation and audit-candidate freeze (NOT A PRODUCTION RELEASE)
+
+The current **proposed auditor scope** is `src/SentinelVaultV35.sol`, `src/SentinelEpochFactoryV36.sol`, `src/PolicyGuard.sol` and `src/interfaces/ISentinelOwnerSignerEpoch.sol`. Unlike the historical `SentinelEpochFactoryV30` (which continues to deploy V29), the separate V36 factory creates **V35** vaults with per-owner guards. `test/SentinelV36FactoryIntegration.t.sol` checks owner and policy isolation, EIP-712 cross-vault replay, roles and historical creator indexing.
+
+The authoritative project handoff is [the v3.6 audit candidate and NO-GO decision](../audit/V36_RELEASE_CANDIDATE.md). The `scripts/check-rc-v36.sh` gate validates the selected files, legacy factory version boundary, Foundry build and all tests, and publication checks; it neither deploys nor authorizes signing or transfers. CI runs this audit gate for the experimental branch only. Audit-candidate status means reproducible **research**, not a production-ready treasury service.
+
+```bash
+cd /mnt/c/Github/qie-sentinel-v2
+git pull --ff-only origin feat/v2-owner-approval
+bash scripts/check-rc-v36.sh
+gh pr checks 1
+```
+
+The existing production Vercel site and mainnet v1.1 deployment remain unchanged. Do not merge PR #1 or deploy the candidate until an independent audit, official-token validation, secure owner UX, reviewed wallet and authenticated executor are completed.
