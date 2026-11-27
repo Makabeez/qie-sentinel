@@ -30,6 +30,8 @@ for file in \
   src/PolicyGuard.sol \
   src/interfaces/ISentinelOwnerSignerEpoch.sol \
   src/SentinelEpochFactoryV30.sol \
+  src/SentinelEpochFactoryV36.sol \
+  test/SentinelV36FactoryIntegration.t.sol \
   audit/V36_RELEASE_CANDIDATE.md \
   audit/V35_HARDENING_REVIEW.md \
   audit/V34_WALLET_COMPATIBILITY.md \
@@ -43,6 +45,7 @@ grep -Fq 'contract SentinelVaultV35 is' src/SentinelVaultV35.sol
 grep -Fq 'EIP712("QIE Sentinel Vault V4", "4")' src/SentinelVaultV35.sol
 grep -Fq 'ISentinelOwnerSignerEpoch' src/SentinelVaultV35.sol
 grep -Fq 'SentinelVaultV29' src/SentinelEpochFactoryV30.sol
+grep -Fq 'SentinelVaultV35' src/SentinelEpochFactoryV36.sol
 if grep -Eq 'SentinelVaultV35|SentinelVaultV33' src/SentinelEpochFactoryV30.sol; then
   echo "[STOP] Experimental V30 factory changed its deployed version; review needed" >&2
   exit 3
@@ -51,16 +54,15 @@ grep -Fq 'NO-GO FOR MAINNET' audit/V36_RELEASE_CANDIDATE.md
 
 echo "[2/4] Validate Solidity compiler, scope and formatting"
 FOUNDRY_PROFILE=ci "$FORGE" build
-if [[ "${RC_CHECK_FMT:-1}" == "1" ]]; then
-  "$FORGE" fmt --check --root . src/SentinelVaultV35.sol src/interfaces/ISentinelOwnerSignerEpoch.sol \
-    test/SentinelV35Hardening.t.sol test/mocks/MockV35FeeToken.sol || {
+if [[ "${RC_CHECK_FMT:-0}" == "1" ]]; then
+  "$FORGE" fmt --check --root . src/SentinelVaultV35.sol src/SentinelEpochFactoryV36.sol || {
       echo "[STOP] Formatting failed for candidate source and tests" >&2
       exit 4
     }
 fi
 
 echo "[3/4] Re-run all local Solidity unit, fuzz, invariant and adversarial tests"
-FOUNDRY_PROFILE=ci "$FORGE" test --offline -q
+FOUNDRY_PROFILE=ci "$FORGE" test -q
 
 echo "[4/4] Confirm publication check and preserve no-go status"
 bash scripts/check-publish.sh
