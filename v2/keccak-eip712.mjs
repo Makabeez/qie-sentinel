@@ -34,12 +34,12 @@ function permute(a){
   a[0]^=rc;
  }
 }
-function hexToBytes(hex){
+export function hexToBytes(hex){
  if(typeof hex!=='string'||!/^0x(?:[0-9a-fA-F]{2})*$/.test(hex))throw new Error('Invalid hex data');
  return Uint8Array.from(hex.slice(2).match(/.{2}/g)?.map(v=>parseInt(v,16))??[]);
 }
 function bytesToHex(bytes){return '0x'+Array.from(bytes,b=>b.toString(16).padStart(2,'0')).join('');}
-function concat(...xs){const n=xs.reduce((s,x)=>s+x.length,0),r=new Uint8Array(n);let i=0;for(const x of xs){r.set(x,i);i+=x.length;}return r;}
+export function concat(...xs){const n=xs.reduce((s,x)=>s+x.length,0),r=new Uint8Array(n);let i=0;for(const x of xs){r.set(x,i);i+=x.length;}return r;}
 function utf8(s){return new TextEncoder().encode(s);}
 export function keccak256(data){
  if(!(data instanceof Uint8Array))throw new TypeError('keccak256 expects Uint8Array');
@@ -54,12 +54,12 @@ export function keccak256(data){
  for(let i=0;i<32;i++)out[i]=Number((a[Math.floor(i/8)]>>BigInt(8*(i%8)))&255n);
  return bytesToHex(out);
 }
-function hashUtf8(s){return hexToBytes(keccak256(utf8(s)));}
-function wordAddress(value){
+export function hashUtf8(s){return hexToBytes(keccak256(utf8(s)));}
+export function wordAddress(value){
  if(typeof value!=='string'||!/^0x[0-9a-fA-F]{40}$/.test(value))throw new Error('Invalid address');
  return hexToBytes('0x'+'0'.repeat(24)+value.slice(2));
 }
-function wordUInt(value){
+export function wordUInt(value){
  if(typeof value!=='string'||!/^(0|[1-9][0-9]*)$/.test(value))throw new Error('Noncanonical uint256');
  const n=BigInt(value);if(n>=(1n<<256n))throw new Error('uint256 overflow');
  return hexToBytes('0x'+n.toString(16).padStart(64,'0'));

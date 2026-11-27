@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Try QIE Sentinel’s offline payment authorization walkthrough.">
+  <title>QIE Sentinel | Payment Authorization Walkthrough</title>
+  <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="./portfolio.css">
+  <script type="module" src="./portfolio.mjs"></script>
+</head>
+<body>
+  <div class="shell">
+    <header class="top">
+      <a class="brand" href="./portfolio.html"><span class="sigil" aria-hidden="true">◇</span> QIE<span class="mint">Sentinel</span></a>
+      <a href="../site/">Hackathon demo</a>
+    </header>
+    <main>
+      <section class="hero">
+        <p class="eyebrow">OFFLINE WALKTHROUGH · V3.6 AUDIT CANDIDATE</p>
+        <h1>What did the owner agree to?</h1>
+        <p>Inspect the EIP-712 digest a V35 vault expects for a payment. Change the amount or executor epoch to see exactly when that digest changes.</p>
+      </section>
+      <div class="layout">
+        <section class="panel form-panel">
+          <h2>Sample payment</h2>
+          <p>The walkthrough uses a fictional vault and a six-decimal sample token. It computes hashes locally and requires no wallet.</p>
+          <form id="payment" novalidate>
+            <label for="amount">Amount (sample tokens)</label>
+            <input id="amount" name="amount" value="0.25" inputmode="decimal" maxlength="19">
+            <label for="epoch">Executor epoch</label>
+            <input id="epoch" name="epoch" value="1" inputmode="numeric" maxlength="78" aria-describedby="epoch-help">
+            <small id="epoch-help">Changing the executor advances this counter. The counter also changes the signed digest if a previous executor is restored.</small>
+            <button class="button primary" type="submit">Compare digests</button>
+          </form>
+        </section>
+        <section class="panel digest-panel">
+          <h2>Digest comparison</h2>
+          <dl>
+            <dt>Original sample</dt>
+            <dd><code id="original"></code></dd>
+            <dt>Current payment</dt>
+            <dd><code id="digest"></code></dd>
+          </dl>
+          <p id="verdict" role="status"></p>
+          <details>
+            <summary>View domain and payment fields</summary>
+            <pre class="auth-json" id="packet"></pre>
+          </details>
+        </section>
+      </div>
+      <section class="footgrid" aria-label="Project evidence">
+        <article>
+          <h2>QIE Mainnet demonstration</h2>
+          <p>Review historical v1.1 payment receipts and run read-only policy checks against the original demonstration vault.</p>
+          <a href="../site/#proof">Inspect the on-chain evidence</a>
+        </article>
+        <article>
+          <h2>V3.6 audit candidate</h2>
+          <p>The experimental V36 factory creates V35 vaults in local tests. The candidate is awaiting independent audit and remains undeployed.</p>
+          <a href="https://github.com/Makabeez/qie-sentinel/blob/feat/v2-owner-approval/audit/V36_RELEASE_CANDIDATE.md">Review the audit scope</a>
+        </article>
+      </section>
+    </main>
+    <footer><a href="https://github.com/Makabeez/qie-sentinel">GitHub source</a><a href="./">Read-only policy lab</a></footer>
+  </div>
+</body>
+</html>

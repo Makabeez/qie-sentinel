@@ -1,0 +1,38 @@
+.hero > .eyebrow {
+  color: #58eecf;
+  font-size: 11px;
+}
+
+.panel h2, .footgrid h2 {
+  font-size: 21px;
+  margin: 0 0 12px;
+}
+
+.panel p {
+  color: #b0c7d9;
+  line-height: 1.6;
+}
+
+.form-panel form {
+  padding-top: 0;
+}
+
+.digest-panel dt {
+  color: #a5b9cd;
+  font-size: 13px;
+  margin-top: 20px;
+}
+
+.digest-panel dd {
+  margin: 8px 0 0;
+  overflow-wrap: anywhere;
+}
+
+.digest-panel code, .digest-panel #verdict {
+  color: #78e7ce;
+}
+
+summary {
+  cursor: pointer;
+  padding: 8px 0;
+}

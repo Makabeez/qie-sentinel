@@ -1,5 +1,10 @@
 # QIE Sentinel v3.6 — Frozen Audit Candidate
 
+Open [the portfolio walkthrough](./portfolio.html) through the local HTTP server
+at `/v2/portfolio.html`. It compares the V35 EIP-712 digest for a fixed sample
+payment with edits to its amount or executor epoch. The page computes the
+digest in the browser with sample data and needs no RPC connection.
+
 **Current milestone:** v3.6. The experimental multi-user vault factory is **undeployed**. The browser previews, live digest verification, and offline integrity lab do **not** authorize payments, verify real wallet signatures, or broadcast transactions. Disposable-key EOA and ERC-1271 signature verification runs only in Foundry tests.
 
 **Entry points:** `v2/index.html` (policy / unsigned proposal), `v2/verify.html` (pinned on-chain digest check), `v2/crypto-lab.html` (offline tamper lab) and `v2/owner-review.html` (digest-bound human risk acknowledgement, **not authorization**). See [Signature Lab](SIGNATURE_LAB_README.md), [Verifier](VERIFY_README.md), and [Threat Model](THREAT_MODEL.md).

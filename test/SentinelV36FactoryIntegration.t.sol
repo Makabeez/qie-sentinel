@@ -90,6 +90,42 @@ contract SentinelV36FactoryIntegrationTest is Test {
         assertFalse(b.isNonceUsed(1));
     }
 
+    function testV36PortfolioRehearsal() public {
+        SentinelVaultV35 vault = _create(alice, executorA);
+        assertEq(vault.owner(), alice);
+        assertEq(vault.executor(), executorA);
+
+        token.mint(address(vault), 1_000_000);
+        vm.prank(alice);
+        vault.setRecipient(recipient, true);
+
+        SentinelVaultV35.Payment memory payment = _payment(vault, executorA, 7);
+        bytes memory signature = _sign(vault, payment, ALICE_KEY);
+        vm.prank(executorA);
+        vault.execute(payment, signature);
+        assertEq(token.balanceOf(recipient), 100_000);
+        assertEq(vault.balance(), 900_000);
+        assertTrue(vault.isNonceUsed(7));
+
+        payment.nonce = 8;
+        signature = _sign(vault, payment, ALICE_KEY);
+        vm.prank(alice);
+        vault.invalidateNonces(0, 1 << 8);
+        vm.expectRevert(abi.encodeWithSelector(SentinelVaultV35.NonceAlreadyUsed.selector, 8));
+        vm.prank(executorA);
+        vault.execute(payment, signature);
+        assertEq(token.balanceOf(recipient), 100_000);
+        assertEq(vault.balance(), 900_000);
+
+        vm.startPrank(alice);
+        vault.pause();
+        vault.emergencyRecover(alice, 900_000);
+        vm.stopPrank();
+        assertTrue(vault.paused());
+        assertEq(vault.balance(), 0);
+        assertEq(token.balanceOf(alice), 900_000);
+    }
+
     function testV36CannotCreateWithZeroSameExecutorOrInvalidLimits() public {
         vm.startPrank(alice);
         vm.expectRevert(SentinelEpochFactoryV36.InvalidExecutor.selector);
