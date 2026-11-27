@@ -15,13 +15,14 @@ The **experimental branch** includes multiple research contracts intentionally p
 | `src/SentinelVaultV35.sol` | **PROPOSED AUDIT TARGET** | Owner/executor separation, signer/owner/executor epochs, exact-delivery pre/post balance checks |
 | `src/PolicyGuard.sol` | **PROPOSED AUDIT TARGET** | Per-vault allowlist, max-per-transfer, UTC-day budget |
 | `src/interfaces/ISentinelOwnerSignerEpoch.sol` | **AUDIT INTERFACE** | Contract-owner signer epoch dependency, not a certification of wallets |
-| `src/SentinelEpochFactoryV30.sol` | **HISTORICAL EXPERIMENT, NOT RELEASE FACTORY** | Deploys `SentinelVaultV29`, **not** V35; deployment would create the wrong version |
+| `src/SentinelEpochFactoryV36.sol` | **PROPOSED AUDIT TARGET** | Separate permissionless test factory deploying **V35**, not deployed; records creators, not current owners |
+| `src/SentinelEpochFactoryV30.sol` | **HISTORICAL EXPERIMENT, NOT RELEASE FACTORY** | Deploys `SentinelVaultV29`, **not** V35; never use for candidate |
 | `src/SentinelVault.sol` / `src/SentinelVaultFactory.sol` | **LEGACY REFERENCE** | Original v1.1-era signed schema; never silently substitute |
 | `src/SentinelVaultV29.sol`, `src/SentinelVaultV33.sol` | **EXPERIMENTAL PREDECESSORS** | Distinct signatures, earlier security designs; not audit target |
 | `v2/` browser UI | **PREVIEW ONLY** | Read-only original-chain verification and unsigned demonstrations; does not sign for V35 |
 | `test/` and `audit/` | **EVIDENCE & AUDIT NOTES** | Tests are reproducible evidence, not a proof or auditor certification |
 
-**No V35 factory exists.** **No V35 production EIP-712 frontend or secure executor exists.** The candidate can therefore be finalized as a **security research deliverable**, not launched as a multi-user treasury product.
+**The separate V36 factory deploys V35 in local tests**, but remains unaudited, undeployed, and does not attest that the constructor token is official QUSDC. **No V35 production EIP-712 frontend or secure executor exists.** The candidate can therefore be finalized as a **security research deliverable**, not launched as a multi-user treasury product.
 
 ## Frozen candidate contract specification
 
@@ -34,7 +35,7 @@ The **experimental branch** includes multiple research contracts intentionally p
 - **Nonce:** permanent bitmap consumption, explicit cancellation available even when paused. Ownership/executor rotation increments signed epochs.
 - **Transfer:** nonce and policy budget consumed atomically with token `safeTransfer`; checks before/after recipient and vault balances for exact payment amount; rejects self-recipient.
 - **Recovery:** owner may pause and transfer assets to an arbitrary nonzero recipient, outside the payment policy. This is by design and a privileged custody risk.
-- **Factory:** none selected; prototype direct constructor is for Foundry-only use. Never repurpose V30 for V35.
+- **Factory:** `SentinelEpochFactoryV36.sol` is selected for audit **only**; deploys V35 per caller, uses an arbitrary constructor token, keeps historical creator registration. Do not deploy or reuse V30.
 
 ## Findings / release blockers and owners
 
@@ -42,7 +43,7 @@ The **experimental branch** includes multiple research contracts intentionally p
 |---|---|---|
 | G1 Independent external audit of V35/Guard/interface + token behavior | **OPEN** | Third-party review, remediation, re-audit and signed report |
 | G2 Trustworthy compatible ERC-1271 wallet | **OPEN** | Verify exact wallet implementation; monotonic epoch across signer/validator/module/recovery/upgrade changes; disallow unknown wallets |
-| G3 Correct V35 factory and chain/token validation | **OPEN** | Separately reviewed versioned factory, explicit verified token identity and chain ID; never reuse V30 |
+| G3 V35 factory and chain/token validation | **PARTIAL — OPEN** | V36 factory/source and local integration tests added; independent audit, chain/token identity checks, and versioned deployment process still required |
 | G4 Human-readable EIP-712 V4 signing UX | **OPEN** | Independent vectors, phishing defense, correct domain/field rendering and owner approval |
 | G5 Authenticated executor and key operations | **OPEN** | Non-custodial design, key rotation, idempotency, incident monitoring, rate limiting, secrets management |
 | G6 Adversarial token and callback review | **OPEN** | Nonstandard balances, fee/rebase/hook/reentrancy/gas-griefing tests; actual QUSDC verification |
@@ -56,7 +57,7 @@ The **experimental branch** includes multiple research contracts intentionally p
 
 **Decision: NO-GO FOR MAINNET / LIVE FUNDS.** The experimental contracts are **audit candidate** code only. Keep PR #1 **draft and unmerged**, retain the original mainnet v1.1 as the publicly demonstrated artifact, and do not run `forge script --broadcast` or supply private keys, seed phrases or production RPC credentials.
 
-**Definition of project finalization at this stage:** one identified auditable vault specification, honest account of open release gates, reproducible tests, a controlled audit manifest, and a clean preserved public demonstration. This is a meaningful finished R&D deliverable, distinct from final authorization to launch a treasury service.
+**Definition of project finalization at this stage:** one identified auditable vault specification, honest account of open release gates, reproducible tests, a local V36 factory integration, a controlled audit manifest, and a clean preserved public demonstration. This is a meaningful finished R&D deliverable, distinct from final authorization to launch a treasury service.
 
 ## Verify in offline-only mode
 
