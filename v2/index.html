@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="QIE Sentinel v2 — read-only payment proposal review against verified QIE Mainnet contracts.">
+<meta name="theme-color" content="#08101d">
+<title>QIE Sentinel 2.2 | Read-only Authorization Preview</title>
+<link rel="stylesheet" href="./style.css">
+<script type="module" src="./app.mjs"></script>
+</head>
+<body>
+<div class="shell">
+<header class="top"><a class="brand" href="../site/" aria-label="QIE Sentinel project home"><span class="sigil">◇</span> QIE<span class="mint">Sentinel</span><span class="version">2.2 LAB</span></a><div class="header-actions"><span class="network">● QIE MAINNET · 1990</span><button type="button" id="connect" class="button quiet">Connect wallet</button></div></header>
+<main>
+<section class="hero"><div class="eyebrow">INDEPENDENT-USER PROTOTYPE · READ-ONLY</div><h1>Approve the idea.<br><span>Never surrender the keys.</span></h1><p>Review proposed QUSDC payments against real policy data from the verified QIE Sentinel vault. Connect a wallet to identify the reviewer—never to sign or move funds in this prototype.</p><div class="notice"><strong>No transaction capability.</strong> This is a review of the existing demonstration vault, <em>not</em> onboarding a user-owned vault or approving an actual payment. A wallet connection grants no ownership or spending rights.</div></section>
+<div class="layout">
+<section class="panel form-panel"><div class="panel-header"><span class="eyebrow">01 / PROPOSAL INPUT</span><span class="live">LIVE RPC CHECK</span></div>
+<form id="proposal" novalidate>
+<label for="recipient">QUSDC recipient</label><input id="recipient" required spellcheck="false" autocomplete="off" value="0xce99cF8EdfD199dB02b830445d89E746B8c1C7ff"><small>Address must be allowlisted in the demonstration PolicyGuard.</small>
+<div class="cols"><div><label for="amount">Amount (QUSDC)</label><input id="amount" required inputmode="decimal" value="0.05"></div><div><label for="nonce">Proposal nonce</label><input id="nonce" required inputmode="numeric" value="3"></div></div>
+<label for="expiry">Deadline (your local time)</label><input id="expiry" type="datetime-local" required><small>Entered in your browser’s local timezone, then converted to UTC for comparison with the latest QIE block timestamp. The check does not rely on your computer clock for the blockchain time.</small>
+<label for="purpose">Payment reason</label><textarea id="purpose" maxlength="240" rows="3" placeholder="Example: Invoice for approved AI compute services" required>Demo: approved AI compute service</textarea><small>Reason is a local review note. The existing vault's EIP-712 Payment does not bind this field.</small>
+<button id="evaluate" type="submit" class="button primary">Evaluate proposal →</button>
+</form></section>
+<section class="panel results"><div class="panel-header"><span class="eyebrow">02 / VERDICT</span><span id="chain-label" class="live">AWAITING DATA</span></div>
+<div class="verdict" id="verdict"><div id="status-icon" class="status-icon">◇</div><h2 id="status-title">No proposal reviewed</h2><p id="status-summary">Complete the proposal and run a live read-only check. An eligible result is not a signature.</p></div>
+<div class="metrics">
+<div><span>Owner signature</span><strong>Not requested</strong></div>
+<div><span>Signing authority</span><strong>Connected wallet does not grant it</strong></div>
+<div><span>Transaction broadcast</span><strong>Disabled</strong></div>
+</div>
+<div id="facts" class="facts" aria-live="polite"></div>
+<div class="actions"><button type="button" id="export" class="button quiet" disabled>Download review JSON</button><button type="button" id="copy" class="button quiet" disabled>Copy review</button></div>
+</section></div>
+<section class="footgrid"><article><span class="eyebrow">03 / TRUST BOUNDARY</span><h3>What this does</h3><p>Reads vault pause state, PolicyGuard limits, the proposed nonce, latest block time and QUSDC balance. Displays block-specific evidence for a reviewer.</p></article><article><span class="eyebrow">04 / NOT YET BUILT</span><h3>True independent onboarding</h3><p>User-controlled vault deployment, EIP-712 signing, dedicated policy management, and execution are intentionally out of scope here. Those features need separate contracts, threat modeling and audit.</p></article></section>
+<section class="panel onboarding">
+ <div class="panel-header"><span class="eyebrow">05 / USER-OWNED VAULT · DESIGN PREVIEW</span><span class="live">NOT DEPLOYED</span></div>
+ <div class="onboarding-intro"><h2>Design your own vault.</h2><p>Build a deployment configuration for a wallet-owned QUSDC vault. The factory contract is still experimental and has <strong>not</strong> been deployed. This form never requests a signature or sends a transaction.</p></div>
+ <div class="onboarding-grid">
+  <form id="vault-plan" class="onboarding-form" novalidate>
+   <label for="new-owner">Proposed vault owner</label>
+   <input id="new-owner" type="text" readonly placeholder="Connect wallet above to identify owner">
+   <small>New vault ownership will belong to the creating wallet. Wallet connection alone does not deploy a vault.</small>
+   <label for="new-executor">Executor wallet address</label>
+   <input id="new-executor" type="text" required autocomplete="off" spellcheck="false" placeholder="0x… (different from owner)">
+   <small>This distinct wallet can only submit intents independently signed by the owner.</small>
+   <div class="cols">
+    <div><label for="new-max">Maximum per payment (QUSDC)</label><input id="new-max" type="text" value="0.10" required inputmode="decimal"></div>
+    <div><label for="new-daily">Daily budget (QUSDC)</label><input id="new-daily" type="text" value="2.00" required inputmode="decimal"></div>
+   </div>
+   <button class="button primary" id="generate-plan" type="button">Generate deployment preview →</button>
+   <p id="plan-feedback" role="status" aria-live="polite" class="plan-feedback">Connect your wallet above and enter a different executor address to prepare a preview.</p>
+  </form>
+  <div class="plan-preview" aria-live="polite">
+   <span class="eyebrow">LOCAL DEPLOYMENT PLAN</span>
+   <h3 id="plan-title">No plan generated</h3>
+   <p id="plan-summary">Connect an EVM wallet, choose a separate executor and set spending limits. A valid plan can be downloaded as JSON, but cannot be deployed here.</p>
+   <div id="plan-facts" class="facts"></div>
+   <button class="button quiet" id="download-plan" type="button" disabled>Download plan JSON</button>
+  </div>
+ </div>
+</section>
+
+<section class="panel authorization" id="authorization-preview">
+ <div class="panel-header"><span class="eyebrow">06 / EXACT EIP-712 PAYMENT · UNSIGNED PREVIEW</span><span class="live">NO SIGNING / NO BROADCAST</span></div>
+ <div class="onboarding-intro"><h2>Inspect exactly what a signature would cover.</h2><p>After a successful live proposal review, prepare the precise typed-data envelope for the existing verified demonstration vault. This shows what <strong>could be signed later</strong>—it never asks your wallet to sign. Only the recorded demo-vault owner may build this preview. The reason/invoice note is <strong>not</strong> part of the on-chain Payment signature.</p></div>
+ <div class="authorization-actions">
+  <button id="prepare-auth" class="button primary" type="button" disabled>Prepare unsigned EIP-712 preview →</button>
+  <button id="download-auth" class="button quiet" type="button" disabled>Download unsigned JSON</button>
+ </div>
+ <p id="auth-feedback" class="plan-feedback" role="status" aria-live="polite">Connect the demo-vault owner wallet and successfully evaluate a proposal first.</p>
+ <div class="auth-output">
+  <strong id="auth-title">No authorization preview prepared</strong>
+  <div id="auth-facts" class="facts"></div>
+  <pre id="auth-json" class="auth-json" aria-label="Unsigned EIP-712 typed data">No data — owner signature not requested.</pre>
+ </div>
+</section>
+</main>
+<footer><span>QIE Sentinel 2.2 · Prototype, unaudited · No custody</span><span><a href="https://github.com/Makabeez/qie-sentinel" rel="noopener noreferrer" target="_blank">Source ↗</a> · <a href="https://mainnet.qie.digital/address/0xb752F05a55059C89a43a289d5d055F303B6DD96E?tab=contract" rel="noopener noreferrer" target="_blank">Verified vault ↗</a></span><a href="./portfolio.html">V35 payment walkthrough</a></footer>
+</div>
+</body></html>

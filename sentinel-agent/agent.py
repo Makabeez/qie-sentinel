@@ -41,11 +41,33 @@ def verify(row):
     return checks
 
 
+DOMAIN_NAME, DOMAIN_VERSION, CHAIN_ID = 'QIE Sentinel Vault', '1', 1990
+EIP712_DOMAIN = 'EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)'
+PAYMENT_STRUCT = 'Payment(address token,address recipient,uint256 amount,uint256 nonce,uint256 deadline,address executor)'
+
+
+def local_digest(row, vault=VAULT, chain_id=CHAIN_ID):
+    """EIP-712 digest computed OFFLINE (no RPC). Never sign a hash an RPC handed you."""
+    k=lambda data: cmd('keccak', data)
+    domain=k(cmd('abi-encode','f(bytes32,bytes32,bytes32,uint256,address)',
+                 k(EIP712_DOMAIN), k(DOMAIN_NAME), k(DOMAIN_VERSION), chain_id, vault))
+    struct=k(cmd('abi-encode','f(bytes32,address,address,uint256,uint256,uint256,address)',
+                 k(PAYMENT_STRUCT), TOKEN, row['recipient'], row['amount'], row['nonce'],
+                 row['deadline'], EXPECTED_EXECUTOR))
+    return k('0x1901'+domain[2:]+struct[2:])
+
+
 def digest(row):
     value=cmd('call',VAULT,PAYMENT_TYPE,payment(row),'--rpc-url',RPC)
     if not HEX32.fullmatch(value):
         raise ValueError('Unexpected digest returned by deployed vault')
-    return value
+    # A malicious or compromised QIE_RPC could return the digest of a DIFFERENT
+    # payment (any allowlisted recipient, max amount, far deadline) and the owner
+    # would blind-sign it with `cast wallet sign --no-hash`. Cross-check offline.
+    expected=local_digest(row)
+    if value.lower()!=expected.lower():
+        raise ValueError('RPC digest does not match locally computed EIP-712 digest; refusing to sign')
+    return expected
 
 
 def approve(id):

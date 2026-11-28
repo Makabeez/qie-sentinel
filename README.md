@@ -14,15 +14,43 @@
 
 </div>
 
-## The problem
+## Give your AI agent a debit card, not your seed phrase
 
-AI agents can propose payments. They should not hold unilateral authority to spend funds. QIE Sentinel demonstrates a narrow, auditable boundary between **agent proposals**, **human signatures**, and **on-chain enforcement**.
+AI agents are starting to pay for things. Today you either hand them your whole wallet or approve every cent yourself. **QIE Sentinel is the third option:** the owner sets an allowance, small payments to approved recipients settle instantly with the agent's key, and anything bigger waits for the owner's exact EIP-712 signature. If the agent key is stolen, the most it can move is today's budget, to approved addresses only, and that limit lives in the contract, not on a server.
 
-QIE Sentinel is a QUSDC-only, human-authorized AI-agent payment prototype. A local agent interprets payment requests and proposes transactions. Deterministic policy checks reject invalid requests before signing. A separate owner signs an **exact EIP-712 payment intent**; an independent executor submits it to the verified Solidity vault, which checks executor, expiry, QUSDC token, nonce, signature, PolicyGuard budget/allowlist and transfer before settlement.
+**The owner sets the allowance. The agent spends inside it. The blockchain enforces it.**
 
-**Scope:** hackathon MVP, not independently audited, not a production wallet or an unattended treasury manager. The public site does not hold keys, authorize payments, or access the private local dashboard.
+| In 60 seconds | |
+|---|---|
+| See the first agent payment with no owner signature | [0xe29947ac… on QIE explorer](https://mainnet.qie.digital/tx/0xe29947ac7b4a3c237e46aa20eda1dc51c5b8e6aec559957950a2f6458ef25d4e) |
+| Try the read-only security lab | [qie-sentinel-peach.vercel.app](https://qie-sentinel-peach.vercel.app/#demo) |
+| Reproduce every claim locally (no keys, no RPC writes) | `bash scripts/verify-all.sh` |
+| Read the attacks we ran on ourselves | [`test/TaskforcePoC.t.sol`](test/TaskforcePoC.t.sol) · fixes in [`test/TaskforceFixes.t.sol`](test/TaskforceFixes.t.sol) |
 
-## Verified QIE Mainnet deployment
+**Scope:** hackathon prototype, not independently audited. The V37 factory hard-caps every vault at 1 QUSDC per payment and 5 QUSDC per day. The public site holds no keys and never signs or broadcasts.
+
+## V37 bounded autonomy — live on QIE Mainnet (28 Nov 2026)
+
+**The owner sets the allowance. The agent spends inside it. The blockchain enforces it.** Small payments to allowlisted recipients settle with the agent's executor key alone (`executeAuto`); anything above the owner-set auto-pay limit still needs the owner's exact EIP-712 signature (`execute`). A stolen agent key can move at most the daily budget, and only to allowlisted addresses.
+
+| Contract | Address | Notes |
+|---|---|---|
+| SentinelFactoryV37 | [`0x12eF30687F3640473ff1473dB98532c8Ce3F0BC9`](https://mainnet.qie.digital/address/0x12eF30687F3640473ff1473dB98532c8Ce3F0BC9?tab=contract) | Source-verified. Permissionless; hard preview caps 1 QUSDC/payment, 5 QUSDC/day |
+| SentinelVaultV37 (demo) | [`0xB83A73691C00fc45C6dEfafAf963D6C189Ac2fe8`](https://mainnet.qie.digital/address/0xB83A73691C00fc45C6dEfafAf963D6C189Ac2fe8) | Created by the factory; auto-pay limit 0.25 QUSDC |
+| PolicyGuard (demo vault) | [`0xf55614bC196F04c7E1CF843015c1381E14DC6E29`](https://mainnet.qie.digital/address/0xf55614bC196F04c7E1CF843015c1381E14DC6E29) | Allowlist + per-payment + daily caps |
+
+| Action | Explorer proof |
+|---|---|
+| Factory deployed | [0x723cf3de…638ef](https://mainnet.qie.digital/tx/0x723cf3de50749e5543fd3cb179e5bb7c9517e04a3a2d4142c1c3865c739638ef) |
+| Vault created through factory | [0xaef98ec7…0e826](https://mainnet.qie.digital/tx/0xaef98ec71858c7e4c41fc8cd1cfa1e6f8337312a6d5607fbeabcc858931e0826) |
+| Recipient allowlisted / auto-pay limit set | [setRecipient](https://mainnet.qie.digital/tx/0x0226a5edde0fa6d550edf6f6e4c6ec53c2c3a10124535ad8080313a56fce05d5) · [setAutoLimit](https://mainnet.qie.digital/tx/0x1807d361f372516d1af0e403e900e49b425c62203af0a963a5c0845f8d02d9c6) |
+| Vault funded, 0.14 QUSDC | [0x84762ce5…0ad688](https://mainnet.qie.digital/tx/0x84762ce5316621294e2ea4352b2e0d8edfd1dc369237a9782208324d460ad688) |
+| **Agent pays 0.10 QUSDC with no owner signature** | [**0xe29947ac…f25d4e**](https://mainnet.qie.digital/tx/0xe29947ac7b4a3c237e46aa20eda1dc51c5b8e6aec559957950a2f6458ef25d4e) |
+| Agent tries 0.30 QUSDC (> 0.25 limit) | Refused: `AutoLimitExceeded(300000, 250000)` (eth_call simulation, not a mined revert) |
+
+**Evidence limitation:** the recipient is our own allowlisted test wallet. This proves bounded autonomous execution on mainnet, not adoption. V37 is unaudited; the factory's hard caps limit what any vault can expose. Reproduce every contract claim locally with `bash scripts/verify-all.sh`.
+
+## Hackathon v1.1 deployment (submitted 21 Nov 2026)
 
 Both contracts have **Contract Source Code Verified** status on the QIE explorer as of **21 November 2026**. Source verification establishes a match to deployed bytecode; it is **not** a security audit.
 
@@ -84,25 +112,28 @@ Read the [architecture and trust boundaries](docs/ARCHITECTURE.md), [security di
 
 ## Repository guide
 
-| Directory | Purpose |
+| Path | Purpose |
 |---|---|
-| [`src/`](src/) · [`test/`](test/) | Deployed Solidity contracts and Foundry security tests |
-| [`script/`](script/) | Foundry deployment utilities |
-| [`sentinel-agent/`](sentinel-agent/) | **Primary local agent**: proposals, EIP-712 owner workflow, executor, evidence and tests |
-| [`site/`](site/) | **Public Vercel showcase** and read-only QIE Mainnet security lab |
-| [`docs/`](docs/) | Architecture, security disclosures and demo guide |
-| [`scripts/`](scripts/) | Validation, dependency installation and verification utilities |
-| [`backend/`](backend/) · [`web/`](web/) · [`tests/`](tests/) | **Legacy proposal-only FastAPI sandbox**; separate from the primary local agent and public site |
-
-The legacy FastAPI sandbox is retained for reproducibility, not used by Vercel and **must not be publicly hosted**. The live site does not connect to either private backend.
+| [`src/SentinelVaultV37.sol`](src/SentinelVaultV37.sol) · [`src/SentinelFactoryV37.sol`](src/SentinelFactoryV37.sol) | **Current**: bounded-autonomy vault + permissionless capped factory (live on mainnet) |
+| [`src/SentinelVaultV35.sol`](src/SentinelVaultV35.sol) | Owner/executor/signer epoch hardening that V37 inherits |
+| [`src/SentinelVault.sol`](src/SentinelVault.sol) · [`src/PolicyGuard.sol`](src/PolicyGuard.sol) | Hackathon v1.1 contracts (live, source-verified); PolicyGuard is reused by V37 |
+| [`src/PolicyGuardRolling.sol`](src/PolicyGuardRolling.sol) | Burst-bounded rolling budget (next release) |
+| [`test/`](test/) | Foundry unit, fuzz, invariant, adversarial and red-team PoC tests |
+| [`script/DeployV37.s.sol`](script/DeployV37.s.sol) | Chain-1990-only factory + demo-vault deployment |
+| [`sentinel-agent/`](sentinel-agent/) | Local agent: proposals, offline-verified EIP-712 owner signing, executor, audit ledger |
+| [`site/`](site/) | Public Vercel site and read-only mainnet lab |
+| [`v2/`](v2/) | Offline EIP-712 signature labs (browser, no network) |
+| [`src/legacy/`](src/legacy/) · [`test/legacy/`](test/legacy/) | Superseded design iterations V29–V36, still compiled and tested |
+| [`archive/legacy-fastapi/`](archive/legacy-fastapi/) | Retired proposal-only FastAPI sandbox; never host it |
 
 ## Build and test locally
 
 - Solidity **0.8.24**, OpenZeppelin **5.0.2**, Forge Std **1.9.7**, `evm_version="paris"`.
 - Foundry unit, fuzz, invariant and adversarial tests; Python unit tests; GitHub Actions workflows for both. [CI status](https://github.com/Makabeez/qie-sentinel/actions).
-- No external independent security audit. No claimed implementation of QIE Wallet, QIE ID, QIEDEX or oracle integrations.
+- No external independent security audit. QIE components used: QUSDC. QIE Wallet, QIE ID, QIEDEX and oracles are not integrated yet.
 
 ```bash
+bash scripts/verify-all.sh        # everything below in one command
 bash scripts/install-deps.sh
 forge build
 FOUNDRY_PROFILE=ci forge test -vv

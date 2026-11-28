@@ -19,3 +19,11 @@ jobs:
           python3 -m unittest discover -s sentinel-agent -p 'test_*.py' -v
       - name: Validate public site assets and security policy
         run: python3 scripts/check-public-site.py
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: QIE Sentinel v2 read-only policy tests
+        run: |
+          node --check v2/app.mjs
+          node --test v2/test-*.mjs

@@ -10,7 +10,9 @@ KNOWN_RECIPIENT = '0xce99cF8EdfD199dB02b830445d89E746B8c1C7ff'
 ALIASES = ('approved service provider', 'approved provider', 'approved recipient',
            'deployer wallet', 'deployer')
 ADDRESS = re.compile(r'0x[a-fA-F0-9]{40}\b')
-AMOUNT = re.compile(r'(?<![\w.])(?P<number>\d+(?:[.,]\d{1,6})?)\s*(?:QUSDC)\b', re.I)
+# Dot decimal only. A comma is ambiguous (1,000 = one thousand OR 1.000) and is rejected below.
+AMOUNT = re.compile(r'(?<![\w.,])(?P<number>\d+(?:\.\d{1,6})?)\s*(?:QUSDC)\b', re.I)
+AMBIGUOUS_NUMBER = re.compile(r'\d[,   ]\d{3}(?!\d)|\d,\d')
 SUSPICIOUS = re.compile(r'\b(?:ignore\s+(?:all\s+)?(?:previous|prior|security|policy)|bypass|override\s+(?:the\s+)?(?:guard|policy|approval)|skip\s+(?:the\s+)?(?:signature|owner|checks)|private\s+key|seed\s+phrase)\b', re.I)
 
 class RequestError(ValueError):
@@ -26,10 +28,12 @@ def parse_request(text):
         raise RequestError('Request contains instructions attempting to bypass payment controls')
     if not re.search(r'\b(?:pay|send|transfer|reimburse|settle)\b',text,re.I):
         raise RequestError('Request must explicitly ask to pay, send, or transfer QUSDC')
+    if AMBIGUOUS_NUMBER.search(text):
+        raise RequestError('Ambiguous number format (thousands separator or decimal comma); write e.g. 1000 or 0.25 QUSDC')
     amounts=list(AMOUNT.finditer(text))
     if len(amounts)!=1:
         raise RequestError('Specify exactly one QUSDC amount, for example 0.05 QUSDC')
-    raw=amounts[0].group('number').replace(',','.')
+    raw=amounts[0].group('number')
     try:
         amount=int(Decimal(raw)*1000000)
     except (InvalidOperation,OverflowError) as exc:
