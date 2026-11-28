@@ -34,6 +34,27 @@ Both contracts have **Contract Source Code Verified** status on the QIE explorer
 
 **Verified compiler configuration:** Solidity 0.8.24, Paris EVM, optimizer enabled, 200 runs. Vault constructor arguments shown on the explorer: QUSDC token, owner `0x395215ab5Dde403801868fa850b89e305F01725E`, executor `0xD0612b00030AC351EAb6A7800E4b7679e3f7D95A`, maximum transfer 1,000,000 raw units, daily limit 5,000,000 raw units.
 
+## V37 bounded autonomy — live on QIE Mainnet (28 Nov 2026)
+
+**The owner sets the allowance. The agent spends inside it. The blockchain enforces it.** Small payments to allowlisted recipients settle with the agent's executor key alone (`executeAuto`); anything above the owner-set auto-pay limit still needs the owner's exact EIP-712 signature (`execute`). A stolen agent key can move at most the daily budget, and only to allowlisted addresses.
+
+| Contract | Address | Notes |
+|---|---|---|
+| SentinelFactoryV37 | [`0x12eF30687F3640473ff1473dB98532c8Ce3F0BC9`](https://mainnet.qie.digital/address/0x12eF30687F3640473ff1473dB98532c8Ce3F0BC9?tab=contract) | Source-verified. Permissionless; hard preview caps 1 QUSDC/payment, 5 QUSDC/day |
+| SentinelVaultV37 (demo) | [`0xB83A73691C00fc45C6dEfafAf963D6C189Ac2fe8`](https://mainnet.qie.digital/address/0xB83A73691C00fc45C6dEfafAf963D6C189Ac2fe8) | Created by the factory; auto-pay limit 0.25 QUSDC |
+| PolicyGuard (demo vault) | [`0xf55614bC196F04c7E1CF843015c1381E14DC6E29`](https://mainnet.qie.digital/address/0xf55614bC196F04c7E1CF843015c1381E14DC6E29) | Allowlist + per-payment + daily caps |
+
+| Action | Explorer proof |
+|---|---|
+| Factory deployed | [0x723cf3de…638ef](https://mainnet.qie.digital/tx/0x723cf3de50749e5543fd3cb179e5bb7c9517e04a3a2d4142c1c3865c739638ef) |
+| Vault created through factory | [0xaef98ec7…0e826](https://mainnet.qie.digital/tx/0xaef98ec71858c7e4c41fc8cd1cfa1e6f8337312a6d5607fbeabcc858931e0826) |
+| Recipient allowlisted / auto-pay limit set | [setRecipient](https://mainnet.qie.digital/tx/0x0226a5edde0fa6d550edf6f6e4c6ec53c2c3a10124535ad8080313a56fce05d5) · [setAutoLimit](https://mainnet.qie.digital/tx/0x1807d361f372516d1af0e403e900e49b425c62203af0a963a5c0845f8d02d9c6) |
+| Vault funded, 0.14 QUSDC | [0x84762ce5…0ad688](https://mainnet.qie.digital/tx/0x84762ce5316621294e2ea4352b2e0d8edfd1dc369237a9782208324d460ad688) |
+| **Agent pays 0.10 QUSDC with no owner signature** | [**0xe29947ac…f25d4e**](https://mainnet.qie.digital/tx/0xe29947ac7b4a3c237e46aa20eda1dc51c5b8e6aec559957950a2f6458ef25d4e) |
+| Agent tries 0.30 QUSDC (> 0.25 limit) | Refused: `AutoLimitExceeded(300000, 250000)` (eth_call simulation, not a mined revert) |
+
+**Evidence limitation:** the recipient is our own allowlisted test wallet. This proves bounded autonomous execution on mainnet, not adoption. V37 is unaudited; the factory's hard caps limit what any vault can expose. Reproduce every contract claim locally with `bash scripts/verify-all.sh`.
+
 ### Historical transaction evidence
 
 | Action | Result | Explorer proof |

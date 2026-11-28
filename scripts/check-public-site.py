@@ -31,7 +31,10 @@ assert '0x196dce5ce2ad7ad2f327eb5ff9d41c171dd0535bbcdb001742832b1862a5d59a' in h
 assert '0x95f122e6b4679727751dd8e111ed4a5892fd9d85d07aa0554fcb1a52127c1b48' in html
 assert html.count('class="verified-link"') >= 2
 assert 'independent customer adoption' in html
+# v3.7: first V37 autonomous (no owner signature) receipt must stay on the evidence wall.
+assert '0xe29947ac7b4a3c237e46aa20eda1dc51c5b8e6aec559957950a2f6458ef25d4e' in html
+assert 'AutoLimitExceeded' in html
 assert 'HISTORICAL AGENT WORKFLOW' in html
 assert 'Read-only' in html
 
-print('Public site checks passed: live RPC only, verified contracts, 3 receipts, no signing or admin endpoints.')
+print('Public site checks passed: live RPC only, verified contracts, 4 receipts (3 signed + 1 autonomous), no signing or admin endpoints.')
