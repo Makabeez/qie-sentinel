@@ -3,7 +3,7 @@ pragma solidity 0.8.24;
 
 import {IERC1271} from "@openzeppelin/contracts/interfaces/IERC1271.sol";
 import {SignatureChecker} from "@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol";
-import {SentinelVaultV33} from "../../src/SentinelVaultV33.sol";
+import {SentinelVaultV33} from "../../src/legacy/SentinelVaultV33.sol";
 
 /// @notice TEST-ONLY wallet supporting monotonic signer epoch for V3.3.
 /// @dev Not a secure production wallet. Uses an explicit controller to simulate

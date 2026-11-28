@@ -4,10 +4,10 @@ pragma solidity 0.8.24;
 import {Test} from "forge-std/Test.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {Pausable} from "@openzeppelin/contracts/utils/Pausable.sol";
-import {SentinelVaultFactory} from "../src/SentinelVaultFactory.sol";
-import {SentinelVault} from "../src/SentinelVault.sol";
-import {PolicyGuard} from "../src/PolicyGuard.sol";
-import {MockQUSDC} from "./mocks/MockQUSDC.sol";
+import {SentinelVaultFactory} from "../../src/legacy/SentinelVaultFactory.sol";
+import {SentinelVault} from "../../src/SentinelVault.sol";
+import {PolicyGuard} from "../../src/PolicyGuard.sol";
+import {MockQUSDC} from "../mocks/MockQUSDC.sol";
 
 /// @notice Sentinel 2.7: self-contained authorization lifecycle using throwaway keys.
 /// @dev All deployments, minting, signatures and transfers live ONLY inside a Foundry test EVM.

@@ -2,8 +2,8 @@
 pragma solidity 0.8.24;
 
 import {Test} from "forge-std/Test.sol";
-import {SentinelVaultV29} from "../../src/SentinelVaultV29.sol";
-import {MockQUSDC} from "../mocks/MockQUSDC.sol";
+import {SentinelVaultV29} from "../../../src/legacy/SentinelVaultV29.sol";
+import {MockQUSDC} from "../../mocks/MockQUSDC.sol";
 
 /// @notice Stateful adversarial handler for separate epoch-protected user vaults.
 /// @dev All signatures use throwaway keys inside an ephemeral Foundry VM.

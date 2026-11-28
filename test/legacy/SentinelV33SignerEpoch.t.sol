@@ -2,10 +2,10 @@
 pragma solidity 0.8.24;
 
 import {Test} from "forge-std/Test.sol";
-import {SentinelVaultV33} from "../src/SentinelVaultV33.sol";
-import {MockQUSDC} from "./mocks/MockQUSDC.sol";
-import {MockV33EpochWallet} from "./mocks/MockV33EpochWallet.sol";
-import {MockV32ContractOwner} from "./mocks/MockV32ContractOwner.sol";
+import {SentinelVaultV33} from "../../src/legacy/SentinelVaultV33.sol";
+import {MockQUSDC} from "../mocks/MockQUSDC.sol";
+import {MockV33EpochWallet} from "../mocks/MockV33EpochWallet.sol";
+import {MockV32ContractOwner} from "../mocks/MockV32ContractOwner.sol";
 
 /// @notice Disposable local EVM proof for compatible contract-wallet signer epochs.
 contract SentinelV33SignerEpochTest is Test {

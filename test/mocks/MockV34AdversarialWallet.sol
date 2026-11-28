@@ -3,7 +3,7 @@ pragma solidity 0.8.24;
 
 import {IERC1271} from "@openzeppelin/contracts/interfaces/IERC1271.sol";
 import {SignatureChecker} from "@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol";
-import {SentinelVaultV33} from "../../src/SentinelVaultV33.sol";
+import {SentinelVaultV33} from "../../src/legacy/SentinelVaultV33.sol";
 
 /// @notice Deliberately unsafe ERC-1271 fixture, NEVER for real assets.
 /// @dev Simulates frozen epoch, unavailable epoch/signature and internal signer changes.

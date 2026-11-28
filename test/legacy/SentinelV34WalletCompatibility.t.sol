@@ -2,9 +2,9 @@
 pragma solidity 0.8.24;
 
 import {Test} from "forge-std/Test.sol";
-import {SentinelVaultV33} from "../src/SentinelVaultV33.sol";
-import {MockV34AdversarialWallet} from "./mocks/MockV34AdversarialWallet.sol";
-import {MockQUSDC} from "./mocks/MockQUSDC.sol";
+import {SentinelVaultV33} from "../../src/legacy/SentinelVaultV33.sol";
+import {MockV34AdversarialWallet} from "../mocks/MockV34AdversarialWallet.sol";
+import {MockQUSDC} from "../mocks/MockQUSDC.sol";
 
 /// @notice Local-only red-team tests: V33 cannot guarantee monotonicity for dishonest wallets.
 /// @dev Passing "reactivation" tests DOCUMENT a release blocker, NOT security of arbitrary wallets.

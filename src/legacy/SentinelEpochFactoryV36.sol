@@ -1,23 +1,24 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.24;
 
-import {SentinelVault} from "./SentinelVault.sol";
+import {SentinelVaultV35} from "../SentinelVaultV35.sol";
 
-/// @title SentinelVaultFactory
-/// @notice Creates independent vaults with each caller as its own owner.
-/// @dev Experimental v2 contract, NOT DEPLOYED and NOT independently audited.
-///      No privileged factory admin, no pooled custody, and no inherited owner key.
-///      Users must explicitly fund/configure their own vault after deployment.
-contract SentinelVaultFactory {
+/// @title SentinelEpochFactoryV36
+/// @notice Experimental AUDIT-CANDIDATE factory for independently owned V35 vaults.
+/// @dev NOT DEPLOYED; local Foundry tests only. No factory admin, shared funds,
+///      signing authority, auto-funding, token transfers or delegate approvals.
+///      Creation history does NOT prove current ownership after a transfer.
+contract SentinelEpochFactoryV36 {
     error InvalidToken();
+    error InvalidLimits();
     error InvalidExecutor();
     error ExecutorMustDifferFromOwner();
 
     address public immutable token;
-    mapping(address => address[]) private _vaultsByOwner;
+    mapping(address => address[]) private _vaultsByCreator;
 
-    event VaultCreated(
-        address indexed owner,
+    event EpochVaultCreated(
+        address indexed creator,
         address indexed vault,
         address indexed guard,
         address executor,
@@ -30,9 +31,8 @@ contract SentinelVaultFactory {
         token = token_;
     }
 
-    /// @notice Permissionless creation; msg.sender always owns their new vault.
-    /// @dev This call deploys a vault but NEVER funds it, signs a payment or sets recipients.
-    ///      PolicyGuard validates nonzero and maxPerTransfer <= dailyLimit.
+    /// @notice Caller is always the initial owner, with a distinct executor.
+    /// @dev No allowlisted recipients, funding or signature creation in factory.
     function createVault(address executor_, uint256 maxPerTransfer_, uint256 dailyLimit_)
         external
         returns (address vaultAddress)
@@ -40,13 +40,12 @@ contract SentinelVaultFactory {
         if (executor_ == address(0)) revert InvalidExecutor();
         if (executor_ == msg.sender) revert ExecutorMustDifferFromOwner();
 
-        SentinelVault vault = new SentinelVault(
+        SentinelVaultV35 vault = new SentinelVaultV35(
             token, msg.sender, executor_, maxPerTransfer_, dailyLimit_
         );
         vaultAddress = address(vault);
-        _vaultsByOwner[msg.sender].push(vaultAddress);
-
-        emit VaultCreated(
+        _vaultsByCreator[msg.sender].push(vaultAddress);
+        emit EpochVaultCreated(
             msg.sender,
             vaultAddress,
             address(vault.guard()),
@@ -56,13 +55,12 @@ contract SentinelVaultFactory {
         );
     }
 
-    /// @notice Deployment history, NOT a statement of present ownership:
-    ///         ownership may later be transferred through Ownable2Step.
+    /// @notice Historical creator lookup; owner() must be queried for current owner.
     function getDeployedVaults(address creator) external view returns (address[] memory) {
-        return _vaultsByOwner[creator];
+        return _vaultsByCreator[creator];
     }
 
     function deployedCount(address creator) external view returns (uint256) {
-        return _vaultsByOwner[creator].length;
+        return _vaultsByCreator[creator].length;
     }
 }

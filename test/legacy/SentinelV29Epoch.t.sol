@@ -2,8 +2,8 @@
 pragma solidity 0.8.24;
 
 import {Test} from "forge-std/Test.sol";
-import {SentinelVaultV29} from "../src/SentinelVaultV29.sol";
-import {MockQUSDC} from "./mocks/MockQUSDC.sol";
+import {SentinelVaultV29} from "../../src/legacy/SentinelVaultV29.sol";
+import {MockQUSDC} from "../mocks/MockQUSDC.sol";
 
 /// @notice Offline non-production V2.9 signature epoch regression suite.
 /// @dev Deploys only to ephemeral Foundry EVM using throwaway keys.

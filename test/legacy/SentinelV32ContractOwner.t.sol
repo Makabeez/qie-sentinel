@@ -4,10 +4,10 @@ pragma solidity 0.8.24;
 import {Test} from "forge-std/Test.sol";
 import {IERC1271} from "@openzeppelin/contracts/interfaces/IERC1271.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
-import {SentinelVaultV29} from "../src/SentinelVaultV29.sol";
-import {SentinelEpochFactoryV30} from "../src/SentinelEpochFactoryV30.sol";
-import {MockQUSDC} from "./mocks/MockQUSDC.sol";
-import {MockV32ContractOwner} from "./mocks/MockV32ContractOwner.sol";
+import {SentinelVaultV29} from "../../src/legacy/SentinelVaultV29.sol";
+import {SentinelEpochFactoryV30} from "../../src/legacy/SentinelEpochFactoryV30.sol";
+import {MockQUSDC} from "../mocks/MockQUSDC.sol";
+import {MockV32ContractOwner} from "../mocks/MockV32ContractOwner.sol";
 
 /// @notice v3.2 local pre-audit ERC-1271 and epoch compatibility regression.
 contract SentinelV32ContractOwnerTest is Test {

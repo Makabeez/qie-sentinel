@@ -9,8 +9,8 @@ import { Ownable2Step } from "@openzeppelin/contracts/access/Ownable2Step.sol";
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 import { Pausable } from "@openzeppelin/contracts/utils/Pausable.sol";
 import { ReentrancyGuard } from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
-import { PolicyGuard } from "./PolicyGuard.sol";
-import { ISentinelOwnerSignerEpoch } from "./interfaces/ISentinelOwnerSignerEpoch.sol";
+import { PolicyGuard } from "../PolicyGuard.sol";
+import { ISentinelOwnerSignerEpoch } from "../interfaces/ISentinelOwnerSignerEpoch.sol";
 
 /// @title SentinelVaultV33
 /// @notice Experimental V3.3 ERC-1271 signer-epoch aware vault; LOCAL TESTS ONLY, NOT DEPLOYED. QUSDC-only agent vault. A delegated executor submits owner-signed, narrowly scoped payments.

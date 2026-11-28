@@ -3,9 +3,9 @@ pragma solidity 0.8.24;
 
 import {Test} from "forge-std/Test.sol";
 import {StdInvariant} from "forge-std/StdInvariant.sol";
-import {SentinelEpochFactoryV30} from "../../src/SentinelEpochFactoryV30.sol";
-import {SentinelVaultV29} from "../../src/SentinelVaultV29.sol";
-import {MockQUSDC} from "../mocks/MockQUSDC.sol";
+import {SentinelEpochFactoryV30} from "../../../src/legacy/SentinelEpochFactoryV30.sol";
+import {SentinelVaultV29} from "../../../src/legacy/SentinelVaultV29.sol";
+import {MockQUSDC} from "../../mocks/MockQUSDC.sol";
 import {SentinelV31Handler} from "./SentinelV31Handler.sol";
 
 /// @notice Stateful random interleavings of two users and their own vaults.

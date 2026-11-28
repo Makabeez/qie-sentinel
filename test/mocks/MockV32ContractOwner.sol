@@ -3,7 +3,7 @@ pragma solidity 0.8.24;
 
 import {IERC1271} from "@openzeppelin/contracts/interfaces/IERC1271.sol";
 import {SignatureChecker} from "@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol";
-import {SentinelVaultV29} from "../../src/SentinelVaultV29.sol";
+import {SentinelVaultV29} from "../../src/legacy/SentinelVaultV29.sol";
 
 /// @notice TEST-ONLY contract owner for the experimental epoch-bound vault.
 /// @dev Not a secure production wallet. Uses an explicit controller to simulate

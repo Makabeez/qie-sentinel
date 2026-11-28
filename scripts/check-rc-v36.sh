@@ -29,14 +29,14 @@ for file in \
   src/SentinelVaultV35.sol \
   src/PolicyGuard.sol \
   src/interfaces/ISentinelOwnerSignerEpoch.sol \
-  src/SentinelEpochFactoryV30.sol \
-  src/SentinelEpochFactoryV36.sol \
-  test/SentinelV36FactoryIntegration.t.sol \
+  src/legacy/SentinelEpochFactoryV30.sol \
+  src/legacy/SentinelEpochFactoryV36.sol \
+  test/legacy/SentinelV36FactoryIntegration.t.sol \
   audit/V36_RELEASE_CANDIDATE.md \
   audit/V35_HARDENING_REVIEW.md \
   audit/V34_WALLET_COMPATIBILITY.md \
   test/SentinelV35Hardening.t.sol \
-  test/SentinelV34WalletCompatibility.t.sol
+  test/legacy/SentinelV34WalletCompatibility.t.sol
 do
   if [[ ! -f "$file" ]]; then echo "[STOP] Missing audit scope file: $file" >&2; exit 3; fi
 done
@@ -44,9 +44,9 @@ done
 grep -Fq 'contract SentinelVaultV35 is' src/SentinelVaultV35.sol
 grep -Fq 'EIP712("QIE Sentinel Vault V4", "4")' src/SentinelVaultV35.sol
 grep -Fq 'ISentinelOwnerSignerEpoch' src/SentinelVaultV35.sol
-grep -Fq 'SentinelVaultV29' src/SentinelEpochFactoryV30.sol
-grep -Fq 'SentinelVaultV35' src/SentinelEpochFactoryV36.sol
-if grep -Eq 'SentinelVaultV35|SentinelVaultV33' src/SentinelEpochFactoryV30.sol; then
+grep -Fq 'SentinelVaultV29' src/legacy/SentinelEpochFactoryV30.sol
+grep -Fq 'SentinelVaultV35' src/legacy/SentinelEpochFactoryV36.sol
+if grep -Eq 'SentinelVaultV35|SentinelVaultV33' src/legacy/SentinelEpochFactoryV30.sol; then
   echo "[STOP] Experimental V30 factory changed its deployed version; review needed" >&2
   exit 3
 fi
@@ -55,7 +55,7 @@ grep -Fq 'NO-GO FOR MAINNET' audit/V36_RELEASE_CANDIDATE.md
 echo "[2/4] Validate Solidity compiler, scope and formatting"
 FOUNDRY_PROFILE=ci "$FORGE" build
 if [[ "${RC_CHECK_FMT:-0}" == "1" ]]; then
-  "$FORGE" fmt --check --root . src/SentinelVaultV35.sol src/SentinelEpochFactoryV36.sol || {
+  "$FORGE" fmt --check --root . src/SentinelVaultV35.sol src/legacy/SentinelEpochFactoryV36.sol || {
       echo "[STOP] Formatting failed for candidate source and tests" >&2
       exit 4
     }

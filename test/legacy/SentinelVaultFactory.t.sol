@@ -2,10 +2,10 @@
 pragma solidity 0.8.24;
 
 import {Test} from "forge-std/Test.sol";
-import {SentinelVaultFactory} from "../src/SentinelVaultFactory.sol";
-import {SentinelVault} from "../src/SentinelVault.sol";
-import {PolicyGuard} from "../src/PolicyGuard.sol";
-import {MockQUSDC} from "./mocks/MockQUSDC.sol";
+import {SentinelVaultFactory} from "../../src/legacy/SentinelVaultFactory.sol";
+import {SentinelVault} from "../../src/SentinelVault.sol";
+import {PolicyGuard} from "../../src/PolicyGuard.sol";
+import {MockQUSDC} from "../mocks/MockQUSDC.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
 contract SentinelVaultFactoryTest is Test {

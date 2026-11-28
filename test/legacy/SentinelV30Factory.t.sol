@@ -3,10 +3,10 @@ pragma solidity 0.8.24;
 
 import {Test} from "forge-std/Test.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
-import {SentinelEpochFactoryV30} from "../src/SentinelEpochFactoryV30.sol";
-import {SentinelVaultV29} from "../src/SentinelVaultV29.sol";
-import {PolicyGuard} from "../src/PolicyGuard.sol";
-import {MockQUSDC} from "./mocks/MockQUSDC.sol";
+import {SentinelEpochFactoryV30} from "../../src/legacy/SentinelEpochFactoryV30.sol";
+import {SentinelVaultV29} from "../../src/legacy/SentinelVaultV29.sol";
+import {PolicyGuard} from "../../src/PolicyGuard.sol";
+import {MockQUSDC} from "../mocks/MockQUSDC.sol";
 
 /// @notice Sentinel 3.0 factory isolation and authorization tests.
 /// @dev Entirely ephemeral local EVM; no deployments, RPC or real assets.

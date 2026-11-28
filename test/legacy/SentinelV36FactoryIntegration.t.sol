@@ -2,9 +2,9 @@
 pragma solidity 0.8.24;
 
 import {Test} from "forge-std/Test.sol";
-import {SentinelEpochFactoryV36} from "../src/SentinelEpochFactoryV36.sol";
-import {SentinelVaultV35} from "../src/SentinelVaultV35.sol";
-import {MockQUSDC} from "./mocks/MockQUSDC.sol";
+import {SentinelEpochFactoryV36} from "../../src/legacy/SentinelEpochFactoryV36.sol";
+import {SentinelVaultV35} from "../../src/SentinelVaultV35.sol";
+import {MockQUSDC} from "../mocks/MockQUSDC.sol";
 
 /// @notice Audit-candidate factory integration; disposable EOA keys, mock tokens, local VM.
 contract SentinelV36FactoryIntegrationTest is Test {
