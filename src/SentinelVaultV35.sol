@@ -31,6 +31,8 @@ contract SentinelVaultV35 is EIP712, Ownable2Step, Pausable, ReentrancyGuard {
     error OwnerExecutorConflict(address account);
     error InvalidRecipient(address account);
     error UnexpectedTransferAmount(uint256 expected, uint256 vaultDebit, uint256 recipientCredit);
+    error RenounceDisabled();
+    error WrongToken(address supplied);
 
     bytes32 public constant PAYMENT_TYPEHASH = keccak256(
         "Payment(address token,address recipient,uint256 amount,uint256 nonce,uint256 deadline,address executor,uint256 ownerEpoch,uint256 executorEpoch,uint256 signerEpoch)"
@@ -91,7 +93,7 @@ contract SentinelVaultV35 is EIP712, Ownable2Step, Pausable, ReentrancyGuard {
         if (payment.signerEpoch != currentSignerEpoch) {
             revert StaleSignerEpoch(payment.signerEpoch, currentSignerEpoch);
         }
-        if (payment.token != address(token)) revert InvalidSignature();
+        if (payment.token != address(token)) revert WrongToken(payment.token);
         if (isNonceUsed(payment.nonce)) revert NonceAlreadyUsed(payment.nonce);
 
         bytes32 digest = paymentDigest(payment);
@@ -185,6 +187,12 @@ contract SentinelVaultV35 is EIP712, Ownable2Step, Pausable, ReentrancyGuard {
         super._transferOwnership(newOwner);
         ++ownerEpoch;
         emit AuthorizationEpochChanged(ownerEpoch, executorEpoch);
+    }
+
+    /// @notice Disabled: renouncing would permanently lock every token in the vault
+    ///         (no owner => no valid signature, no pause, no emergencyRecover).
+    function renounceOwnership() public view override onlyOwner {
+        revert RenounceDisabled();
     }
 
     function setRecipient(address recipient, bool allowed) external onlyOwner {

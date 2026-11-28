@@ -21,28 +21,23 @@ PAYMENT_EXECUTED_TOPIC = '0xf667481f4d24622c7e078738f5329ac66d13d43ca14a97896cff
 BUDGET_CONSUMED_TOPIC = '0xc6a60832f21db26f376b4d58c7404edbf71955ea89af3457027e3d2d7192dae1'
 WEB = Path(__file__).resolve().parent / 'web'
 
-# Selectors verified via `cast sig` using script startup if possible; fail closed otherwise.
-import subprocess
 from workflow import submit, proposals, events
 
-def selector(signature):
-    result = subprocess.run([os.environ.get('SENTINEL_CAST', str(Path.home() / '.foundry/bin/cast')), 'sig', signature], capture_output=True, text=True, timeout=8, check=True)
-    return result.stdout.strip().lower()
-
-SIGS = {
-    'owner': 'owner()',
-    'executor': 'executor()',
-    'token': 'token()',
-    'guard': 'guard()',
-    'paused': 'paused()',
-    'balance': 'balance()',
-    'max': 'maxPerTransfer()',
-    'daily': 'dailyLimit()',
-    'remaining': 'remainingToday()',
-    'allowed': 'allowedRecipients(address)',
-    'nonce': 'isNonceUsed(uint256)',
+# keccak256(signature)[:4], pinned so the server starts without Foundry installed.
+# Re-verify with: cast sig '<signature>'  (tests/test_selectors.py does this when cast exists)
+SELECTORS = {
+    'owner': '0x8da5cb5b',      # owner()
+    'executor': '0xc34c08e5',   # executor()
+    'token': '0xfc0c546a',      # token()
+    'guard': '0x7ceab3b1',      # guard()
+    'paused': '0x5c975abb',     # paused()
+    'balance': '0xb69ef8a8',    # balance()
+    'max': '0xd1129bf3',        # maxPerTransfer()
+    'daily': '0x67eeba0c',      # dailyLimit()
+    'remaining': '0xfc3c5515',  # remainingToday()
+    'allowed': '0x4df6d6cc',    # allowedRecipients(address)
+    'nonce': '0x5d00bb12',      # isNonceUsed(uint256)
 }
-SELECTORS = {key: selector(sig) for key, sig in SIGS.items()}
 
 
 def rpc(method, params):
@@ -165,7 +160,20 @@ class Handler(SimpleHTTPRequestHandler):
             # Browser canceled the request; cannot send a second response.
             pass
 
+    def _local_host_ok(self):
+        host = self.headers.get('Host', '')
+        port = self.server.server_port
+        return host in (f'127.0.0.1:{port}', f'localhost:{port}')
+
+    def list_directory(self, path):
+        self.send_error(404, 'Not found')  # no directory listings
+        return None
+
     def do_GET(self):
+        # Reject DNS rebinding for ALL reads, not only writes: proposals and the audit
+        # trail (recipients, amounts, digests, tx hashes) are private.
+        if not self._local_host_ok():
+            return self.json_response(403, {'error': 'Invalid local host'})
         if self.path not in ('/api/state', '/api/payments', '/api/proposals', '/api/agent/events'):
             return super().do_GET()
         try:
@@ -193,8 +201,7 @@ class Handler(SimpleHTTPRequestHandler):
         if self.path not in ('/api/evaluate','/api/proposals','/api/agent/demo','/api/agent/interpret','/api/agent/request','/api/agent/advice'):
             return self.json_response(404, {'error':'Unknown endpoint'})
         # Reject DNS rebinding to this loopback-only service.
-        host = self.headers.get('Host', '')
-        if host not in (f'127.0.0.1:{self.server.server_port}', f'localhost:{self.server.server_port}'):
+        if not self._local_host_ok():
             return self.json_response(403, {'error':'Invalid local host'})
         # Prevent unrelated websites from issuing local write requests via browser.
         origin = self.headers.get('Origin')
@@ -255,7 +262,8 @@ class Handler(SimpleHTTPRequestHandler):
         except (ValueError,TypeError,KeyError) as exc:
             self.json_response(400,{'error':str(exc)})
         except Exception as exc:
-            self.json_response(503,{'error':str(exc)})
+            logging.exception('internal error')
+            self.json_response(503,{'error':'Upstream RPC or internal error; nothing was saved or signed'})
 
     def log_message(self, fmt, *args):
         print('%s - %s' % (self.address_string(),fmt % args),flush=True)

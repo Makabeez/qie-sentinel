@@ -4,12 +4,28 @@ import os
 import sqlite3
 import time
 import uuid
+from contextlib import contextmanager
 from pathlib import Path
 
 DB = Path(os.environ.get('SENTINEL_DB', str(Path(__file__).resolve().parent / 'data' / 'sentinel.sqlite3')))
 
 
+@contextmanager
 def connection():
+    """Commit on success, roll back on error, and ALWAYS close.
+
+    sqlite3's own `with con:` only manages the transaction; it never closes the
+    handle, so the previous version leaked one connection per HTTP request.
+    """
+    con = _open()
+    try:
+        with con:
+            yield con
+    finally:
+        con.close()
+
+
+def _open():
     DB.parent.mkdir(parents=True, exist_ok=True)
     con = sqlite3.connect(str(DB), timeout=10)
     con.row_factory = sqlite3.Row

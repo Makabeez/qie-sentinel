@@ -14,11 +14,17 @@ from workflow import connection, submit, proposals, audit
 UNKNOWN_RECIPIENT = '0x000000000000000000000000000000000000dEaD'
 
 
-def available_nonce(start=3, limit=500):
-    """Pick a nonce unused on-chain and not reserved in local active proposals."""
+def available_nonce(start=3, limit=64):
+    """Pick a nonce unused on-chain and not reserved locally.
+
+    Scans from the highest nonce the ledger has ever used instead of from 3, so the
+    common case costs one eth_call instead of O(history) sequential RPC round-trips.
+    """
     with connection() as con:
         reserved = {r[0] for r in con.execute(
             "SELECT nonce FROM proposals WHERE status IN ('AWAITING_OWNER','SIGNED','SUBMITTING','SUBMITTED','CONFIRMED')")}
+        high = con.execute('SELECT MAX(nonce) FROM proposals').fetchone()[0]
+    start = max(start, (high or 0) + 1)
     for nonce in range(start, start + limit):
         if nonce not in reserved and not call(VAULT, 'nonce', format(nonce, '064x')):
             return nonce

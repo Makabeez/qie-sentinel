@@ -66,8 +66,10 @@ def advisory(text, *, consent, nonce_provider, interpreter, fetch=None, environ=
         raise AdvisoryError('Invalid model configuration')
     # Deterministic interpreter + live on-chain checks are authoritative.
     parsed=interpreter(text, nonce_provider())
+    # The raw request text is NOT forwarded: the model only needs the deterministic
+    # result to explain it, and forwarding attacker-controlled text is the injection
+    # path that can make the narrator tell the human signer "pre-cleared, safe to sign".
     facts={
-        'untrusted_payment_request': text,
         'parsed_amount_qusdc': parsed['amountQUSDC'],
         'recipient': parsed['recipient'],
         'recipient_source': parsed['recipientSource'],
@@ -96,6 +98,6 @@ def advisory(text, *, consent, nonce_provider, interpreter, fetch=None, environ=
     explanation=_extract_text(response_json)
     # The model does not control the policy data returned to the browser.
     return {'engine':'openai-advisory-only', 'model':model,
-            'advice':explanation, 'policy':parsed,
+            'advice':explanation, 'adviceTrust':'UNTRUSTED_MODEL_OUTPUT', 'policy':parsed,
             'notice':'Explanatory text only. Owner signature and on-chain checks are still mandatory. '
                      'Nothing has been approved, saved, signed, or executed by this request.'}
